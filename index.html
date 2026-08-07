@@ -1,441 +1,3114 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Polyatomic Ion Formula Finder</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <style>
-    * {
-      box-sizing: border-box;
+<title>Polyatomic Ion Study Lab</title>
+
+<style>
+
+:root {
+    --background: #f4f7fb;
+    --card: #ffffff;
+    --text: #17202a;
+    --muted: #667085;
+    --border: #d9e1ea;
+
+    --primary: #1f5f99;
+    --primary-dark: #16466f;
+
+    --correct: #19764a;
+    --correct-background: #edf9f2;
+
+    --incorrect: #a53a3a;
+    --incorrect-background: #fff0f0;
+
+    --reveal: #8a5a00;
+    --reveal-background: #fff8e6;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    padding: 30px 16px 50px;
+    min-height: 100vh;
+
+    font-family: Arial, Helvetica, sans-serif;
+
+    background: var(--background);
+    color: var(--text);
+}
+
+.app {
+    max-width: 850px;
+    margin: 0 auto;
+}
+
+
+/* ----------------------------------------------------
+   HEADER
+---------------------------------------------------- */
+
+header {
+    text-align: center;
+    margin-bottom: 22px;
+}
+
+header h1 {
+    margin: 0 0 10px;
+    font-size: 2.5rem;
+}
+
+header p {
+    max-width: 650px;
+    margin: auto;
+
+    color: var(--muted);
+    line-height: 1.5;
+}
+
+
+/* ----------------------------------------------------
+   SETTINGS
+---------------------------------------------------- */
+
+.settings {
+    background: white;
+
+    border: 1px solid var(--border);
+    border-radius: 15px;
+
+    padding: 18px;
+
+    margin-bottom: 15px;
+}
+
+.settings-grid {
+    display: grid;
+
+    grid-template-columns: 1fr 1fr auto;
+
+    gap: 12px;
+
+    align-items: end;
+}
+
+label {
+    display: block;
+
+    font-size: .85rem;
+    font-weight: bold;
+
+    margin-bottom: 6px;
+}
+
+select,
+input {
+    width: 100%;
+
+    border: 1.5px solid #c8d2dc;
+    border-radius: 9px;
+
+    padding: 12px;
+
+    font-size: 1rem;
+
+    background: white;
+}
+
+select:focus,
+input:focus {
+    outline: none;
+
+    border-color: var(--primary);
+
+    box-shadow:
+        0 0 0 3px rgba(31,95,153,.12);
+}
+
+
+/* ----------------------------------------------------
+   BUTTONS
+---------------------------------------------------- */
+
+button {
+    border: none;
+
+    border-radius: 9px;
+
+    padding: 12px 16px;
+
+    font-weight: bold;
+    font-size: .95rem;
+
+    cursor: pointer;
+}
+
+.primary-button {
+    background: var(--primary);
+    color: white;
+}
+
+.primary-button:hover {
+    background: var(--primary-dark);
+}
+
+.secondary-button {
+    background: #e8edf2;
+    color: #25313d;
+}
+
+.secondary-button:hover {
+    background: #dbe1e7;
+}
+
+.reveal-button {
+    background: white;
+
+    border: 1px solid #b8cadb;
+
+    color: var(--primary-dark);
+}
+
+
+/* ----------------------------------------------------
+   STATISTICS
+---------------------------------------------------- */
+
+.stats {
+    display: grid;
+
+    grid-template-columns:
+        repeat(4, 1fr);
+
+    gap: 10px;
+
+    margin-bottom: 15px;
+}
+
+.stat {
+    background: white;
+
+    border: 1px solid var(--border);
+    border-radius: 12px;
+
+    padding: 12px;
+
+    text-align: center;
+}
+
+.stat-number {
+    font-size: 1.35rem;
+    font-weight: bold;
+
+    color: var(--primary-dark);
+}
+
+.stat-label {
+    font-size: .75rem;
+
+    margin-top: 3px;
+
+    color: var(--muted);
+
+    text-transform: uppercase;
+}
+
+
+/* ----------------------------------------------------
+   STUDY CARD
+---------------------------------------------------- */
+
+.study-card {
+    background: white;
+
+    border: 1px solid var(--border);
+    border-radius: 17px;
+
+    overflow: hidden;
+}
+
+
+/* progress bar */
+
+.progress-track {
+    height: 7px;
+
+    background: #e5ebf0;
+}
+
+.progress-bar {
+    height: 100%;
+
+    width: 0%;
+
+    background: var(--primary);
+
+    transition: width .2s;
+}
+
+
+/* card header */
+
+.card-header {
+    display: flex;
+
+    justify-content: space-between;
+    align-items: center;
+
+    padding: 15px 20px;
+
+    background: #eef4fa;
+
+    border-bottom: 1px solid var(--border);
+}
+
+.question-type {
+    font-weight: bold;
+
+    color: var(--primary-dark);
+}
+
+.question-number {
+    color: var(--muted);
+
+    font-size: .9rem;
+}
+
+
+/* card body */
+
+.card-body {
+    padding: 30px 24px;
+}
+
+.prompt-label {
+    text-align: center;
+
+    text-transform: uppercase;
+
+    font-size: .8rem;
+    font-weight: bold;
+
+    color: var(--muted);
+
+    letter-spacing: .05em;
+}
+
+.prompt {
+    min-height: 120px;
+
+    display: flex;
+
+    justify-content: center;
+    align-items: center;
+
+    text-align: center;
+
+    font-size: 3.6rem;
+    font-weight: bold;
+
+    color: #173f61;
+
+    margin: 5px 0 20px;
+}
+
+.name-prompt {
+    font-size: 3rem;
+}
+
+
+/* ----------------------------------------------------
+   CHEMICAL FORMATTING
+---------------------------------------------------- */
+
+.chem {
+    white-space: nowrap;
+}
+
+/*
+
+These control how chemical formulas display.
+
+Example:
+
+SO<sub>4</sub><sup>2−</sup>
+
+displays as:
+
+SO₄²⁻
+
+*/
+
+.chem sub {
+    font-size: .62em;
+
+    line-height: 0;
+
+    vertical-align: -.32em;
+}
+
+.chem sup {
+    font-size: .58em;
+
+    line-height: 0;
+
+    vertical-align: .72em;
+
+    margin-left: .03em;
+}
+
+
+/* ----------------------------------------------------
+   ANSWER AREA
+---------------------------------------------------- */
+
+.answer-area {
+    max-width: 610px;
+
+    margin: auto;
+}
+
+.answer-help {
+    font-size: .83rem;
+
+    color: var(--muted);
+
+    line-height: 1.4;
+
+    margin-top: 7px;
+}
+
+.answer-help code {
+    background: #eef1f4;
+
+    padding: 2px 5px;
+
+    border-radius: 4px;
+}
+
+.answer-buttons {
+    display: grid;
+
+    grid-template-columns: 1.2fr .8fr;
+
+    gap: 10px;
+
+    margin-top: 13px;
+}
+
+
+/* ----------------------------------------------------
+   FEEDBACK
+---------------------------------------------------- */
+
+.feedback {
+    display: none;
+
+    max-width: 610px;
+
+    margin: 18px auto 0;
+
+    padding: 15px;
+
+    border-radius: 10px;
+
+    line-height: 1.5;
+}
+
+.feedback.correct {
+    display: block;
+
+    color: var(--correct);
+
+    background: var(--correct-background);
+
+    border: 1px solid #bfe6cf;
+}
+
+.feedback.incorrect {
+    display: block;
+
+    color: var(--incorrect);
+
+    background: var(--incorrect-background);
+
+    border: 1px solid #efc3c3;
+}
+
+.feedback.revealed {
+    display: block;
+
+    color: var(--reveal);
+
+    background: var(--reveal-background);
+
+    border: 1px solid #ead49c;
+}
+
+
+/* ----------------------------------------------------
+   NEXT BUTTONS
+---------------------------------------------------- */
+
+.next-buttons {
+    display: none;
+
+    max-width: 610px;
+
+    margin: 12px auto 0;
+
+    grid-template-columns: 1fr 1fr;
+
+    gap: 10px;
+}
+
+.next-buttons.show {
+    display: grid;
+}
+
+
+/* ----------------------------------------------------
+   COMPLETION
+---------------------------------------------------- */
+
+.completion {
+    display: none;
+
+    text-align: center;
+
+    padding: 40px 25px;
+}
+
+.completion.show {
+    display: block;
+}
+
+.completion h2 {
+    font-size: 2rem;
+
+    margin-top: 0;
+}
+
+.completion p {
+    color: var(--muted);
+
+    line-height: 1.5;
+}
+
+
+/* ----------------------------------------------------
+   MOBILE
+---------------------------------------------------- */
+
+@media (max-width: 700px) {
+
+    .settings-grid {
+        grid-template-columns: 1fr;
     }
 
-    body {
-      margin: 0;
-      min-height: 100vh;
-      padding: 40px 20px;
-      font-family: Arial, Helvetica, sans-serif;
-      background: #f3f5f7;
-      color: #222;
+    .stats {
+        grid-template-columns:
+            repeat(2, 1fr);
     }
 
-    .container {
-      max-width: 700px;
-      margin: 0 auto;
-      padding: 32px;
-      background: #ffffff;
-      border-radius: 16px;
-      box-shadow: 0 6px 24px rgba(0, 0, 0, 0.12);
+    .prompt {
+        font-size: 2.8rem;
     }
 
-    h1 {
-      margin: 0 0 10px;
-      text-align: center;
-      font-size: 2rem;
+    .name-prompt {
+        font-size: 2.4rem;
     }
 
-    .subtitle {
-      margin-bottom: 28px;
-      text-align: center;
-      color: #666;
-      line-height: 1.5;
+    .answer-buttons,
+    .next-buttons.show {
+        grid-template-columns: 1fr;
     }
+}
 
-    label {
-      display: block;
-      margin-bottom: 8px;
-      font-weight: 700;
-      font-size: 1.05rem;
-    }
-
-    input {
-      width: 100%;
-      padding: 14px 16px;
-      border: 2px solid #c7cdd3;
-      border-radius: 10px;
-      font-size: 1.1rem;
-    }
-
-    input:focus {
-      border-color: #24547d;
-      outline: none;
-      box-shadow: 0 0 0 3px rgba(36, 84, 125, 0.12);
-    }
-
-    .buttons {
-      display: flex;
-      gap: 10px;
-      margin-top: 14px;
-    }
-
-    button {
-      flex: 1;
-      padding: 13px 16px;
-      border: 0;
-      border-radius: 10px;
-      font-size: 1rem;
-      font-weight: 700;
-      cursor: pointer;
-    }
-
-    #findButton {
-      background: #24547d;
-      color: #ffffff;
-    }
-
-    #findButton:hover {
-      background: #193e5e;
-    }
-
-    #clearButton {
-      background: #e7eaed;
-      color: #222;
-    }
-
-    #clearButton:hover {
-      background: #d6dadd;
-    }
-
-    .result {
-      display: none;
-      margin-top: 28px;
-      padding: 26px;
-      text-align: center;
-      background: #f4f8fc;
-      border: 2px solid #d6e3ef;
-      border-radius: 12px;
-    }
-
-    .result-name {
-      font-size: 1.35rem;
-      font-weight: 700;
-    }
-
-    .formula {
-      margin: 14px 0;
-      color: #153d63;
-      font-size: 3rem;
-      font-weight: 700;
-      line-height: 1.2;
-    }
-
-    .formula sub {
-      font-size: 0.6em;
-    }
-
-    .formula sup {
-      font-size: 0.55em;
-    }
-
-    .charge {
-      color: #555;
-      font-size: 1.05rem;
-    }
-
-    .message {
-      display: none;
-      margin-top: 20px;
-      padding: 14px;
-      text-align: center;
-      border-radius: 10px;
-      background: #fff1f1;
-      color: #8c1d1d;
-    }
-
-    .examples {
-      margin-top: 24px;
-      color: #6a6a6a;
-      text-align: center;
-      font-size: 0.9rem;
-      line-height: 1.5;
-    }
-
-    @media (max-width: 520px) {
-      .container {
-        padding: 22px;
-      }
-
-      .buttons {
-        flex-direction: column;
-      }
-
-      .formula {
-        font-size: 2.5rem;
-      }
-    }
-  </style>
+</style>
 </head>
 
+
 <body>
-  <main class="container">
-    <h1>Polyatomic Ion Formula Finder</h1>
 
-    <p class="subtitle">
-      Type the name of a polyatomic ion to display its formula and charge.
-    </p>
+<div class="app">
 
-    <label for="ionInput">Polyatomic ion name</label>
 
-    <input
-      id="ionInput"
-      type="text"
-      list="ionList"
-      placeholder="Example: sulfate"
-      autocomplete="off"
-    >
+<!-- ==================================================
+     HEADER
+================================================== -->
 
-    <datalist id="ionList"></datalist>
+<header>
 
-    <div class="buttons">
-      <button id="findButton" type="button">Find Formula</button>
-      <button id="clearButton" type="button">Clear</button>
-    </div>
+<h1>Polyatomic Ion Study Lab</h1>
 
-    <section id="result" class="result" aria-live="polite">
-      <div id="resultName" class="result-name"></div>
-      <div id="formula" class="formula"></div>
-      <div id="charge" class="charge"></div>
-    </section>
+<p>
+Practice identifying polyatomic ions in both directions.
+You may be given the ion name and asked for the formula,
+or given the chemical formula and asked for the name.
+</p>
 
-    <div id="message" class="message" aria-live="polite">
-      Ion not found. Check the spelling and try again.
-    </div>
+</header>
 
-    <p class="examples">
-      Try: sulfate, nitrate, ammonium, hydroxide, phosphate, carbonate,
-      acetate, permanganate, or dichromate.
-    </p>
-  </main>
 
-  <script>
-    const ions = {
-      "acetate": {
-        name: "Acetate",
-        formula: "C<sub>2</sub>H<sub>3</sub>O<sub>2</sub><sup>&minus;</sup>",
-        charge: "1−"
-      },
-      "ammonium": {
-        name: "Ammonium",
-        formula: "NH<sub>4</sub><sup>+</sup>",
-        charge: "1+"
-      },
-      "carbonate": {
-        name: "Carbonate",
-        formula: "CO<sub>3</sub><sup>2&minus;</sup>",
-        charge: "2−"
-      },
-      "hydrogen carbonate": {
-        name: "Hydrogen Carbonate",
-        formula: "HCO<sub>3</sub><sup>&minus;</sup>",
-        charge: "1−"
-      },
-      "bicarbonate": {
-        name: "Hydrogen Carbonate (Bicarbonate)",
-        formula: "HCO<sub>3</sub><sup>&minus;</sup>",
-        charge: "1−"
-      },
-      "hydroxide": {
-        name: "Hydroxide",
-        formula: "OH<sup>&minus;</sup>",
-        charge: "1−"
-      },
-      "nitrate": {
-        name: "Nitrate",
-        formula: "NO<sub>3</sub><sup>&minus;</sup>",
-        charge: "1−"
-      },
-      "nitrite": {
-        name: "Nitrite",
-        formula: "NO<sub>2</sub><sup>&minus;</sup>",
-        charge: "1−"
-      },
-      "sulfate": {
-        name: "Sulfate",
-        formula: "SO<sub>4</sub><sup>2&minus;</sup>",
-        charge: "2−"
-      },
-      "sulfite": {
-        name: "Sulfite",
-        formula: "SO<sub>3</sub><sup>2&minus;</sup>",
-        charge: "2−"
-      },
-      "hydrogen sulfate": {
-        name: "Hydrogen Sulfate",
-        formula: "HSO<sub>4</sub><sup>&minus;</sup>",
-        charge: "1−"
-      },
-      "bisulfate": {
-        name: "Hydrogen Sulfate (Bisulfate)",
-        formula: "HSO<sub>4</sub><sup>&minus;</sup>",
-        charge: "1−"
-      },
-      "phosphate": {
-        name: "Phosphate",
-        formula: "PO<sub>4</sub><sup>3&minus;</sup>",
-        charge: "3−"
-      },
-      "hydrogen phosphate": {
-        name: "Hydrogen Phosphate",
-        formula: "HPO<sub>4</sub><sup>2&minus;</sup>",
-        charge: "2−"
-      },
-      "dihydrogen phosphate": {
-        name: "Dihydrogen Phosphate",
-        formula: "H<sub>2</sub>PO<sub>4</sub><sup>&minus;</sup>",
-        charge: "1−"
-      },
-      "hypochlorite": {
-        name: "Hypochlorite",
-        formula: "ClO<sup>&minus;</sup>",
-        charge: "1−"
-      },
-      "chlorite": {
-        name: "Chlorite",
-        formula: "ClO<sub>2</sub><sup>&minus;</sup>",
-        charge: "1−"
-      },
-      "chlorate": {
-        name: "Chlorate",
-        formula: "ClO<sub>3</sub><sup>&minus;</sup>",
-        charge: "1−"
-      },
-      "perchlorate": {
-        name: "Perchlorate",
-        formula: "ClO<sub>4</sub><sup>&minus;</sup>",
-        charge: "1−"
-      },
-      "bromate": {
-        name: "Bromate",
-        formula: "BrO<sub>3</sub><sup>&minus;</sup>",
-        charge: "1−"
-      },
-      "iodate": {
-        name: "Iodate",
-        formula: "IO<sub>3</sub><sup>&minus;</sup>",
-        charge: "1−"
-      },
-      "permanganate": {
-        name: "Permanganate",
-        formula: "MnO<sub>4</sub><sup>&minus;</sup>",
-        charge: "1−"
-      },
-      "chromate": {
-        name: "Chromate",
-        formula: "CrO<sub>4</sub><sup>2&minus;</sup>",
-        charge: "2−"
-      },
-      "dichromate": {
-        name: "Dichromate",
-        formula: "Cr<sub>2</sub>O<sub>7</sub><sup>2&minus;</sup>",
-        charge: "2−"
-      },
-      "cyanide": {
-        name: "Cyanide",
-        formula: "CN<sup>&minus;</sup>",
-        charge: "1−"
-      },
-      "cyanate": {
-        name: "Cyanate",
-        formula: "OCN<sup>&minus;</sup>",
-        charge: "1−"
-      },
-      "thiocyanate": {
-        name: "Thiocyanate",
-        formula: "SCN<sup>&minus;</sup>",
-        charge: "1−"
-      },
-      "peroxide": {
-        name: "Peroxide",
-        formula: "O<sub>2</sub><sup>2&minus;</sup>",
-        charge: "2−"
-      },
-      "oxalate": {
-        name: "Oxalate",
-        formula: "C<sub>2</sub>O<sub>4</sub><sup>2&minus;</sup>",
-        charge: "2−"
-      },
-      "thiosulfate": {
-        name: "Thiosulfate",
-        formula: "S<sub>2</sub>O<sub>3</sub><sup>2&minus;</sup>",
-        charge: "2−"
-      },
-      "borate": {
-        name: "Borate",
-        formula: "BO<sub>3</sub><sup>3&minus;</sup>",
-        charge: "3−"
-      },
-      "hydronium": {
-        name: "Hydronium",
-        formula: "H<sub>3</sub>O<sup>+</sup>",
-        charge: "1+"
-      }
+
+<!-- ==================================================
+     SETTINGS
+================================================== -->
+
+<section class="settings">
+
+<div class="settings-grid">
+
+
+<div>
+
+<label for="modeSelect">
+Question Mode
+</label>
+
+<select id="modeSelect">
+
+<option value="mixed">
+Mixed: Name ↔ Formula
+</option>
+
+<option value="nameToFormula">
+Name → Formula
+</option>
+
+<option value="formulaToName">
+Formula → Name
+</option>
+
+</select>
+
+</div>
+
+
+
+<div>
+
+<label for="groupSelect">
+Ion Set
+</label>
+
+<select id="groupSelect">
+
+<option value="all">
+All Polyatomic Ions
+</option>
+
+<option value="oxyanions">
+Oxyanions
+</option>
+
+<option value="common">
+Other Common Polyatomic Ions
+</option>
+
+<option value="rules">
+Naming Rule Ions
+</option>
+
+<option value="solubility">
+Additional Ions
+</option>
+
+</select>
+
+</div>
+
+
+
+<button
+id="restartButton"
+class="secondary-button"
+type="button">
+
+Shuffle / Restart
+
+</button>
+
+
+</div>
+
+</section>
+
+
+
+<!-- ==================================================
+     STATISTICS
+================================================== -->
+
+<section class="stats">
+
+
+<div class="stat">
+
+<div
+id="scoreValue"
+class="stat-number">
+
+0 / 0
+
+</div>
+
+<div class="stat-label">
+Correct
+</div>
+
+</div>
+
+
+
+<div class="stat">
+
+<div
+id="streakValue"
+class="stat-number">
+
+0
+
+</div>
+
+<div class="stat-label">
+Streak
+</div>
+
+</div>
+
+
+
+<div class="stat">
+
+<div
+id="remainingValue"
+class="stat-number">
+
+0
+
+</div>
+
+<div class="stat-label">
+Remaining
+</div>
+
+</div>
+
+
+
+<div class="stat">
+
+<div
+id="accuracyValue"
+class="stat-number">
+
+—
+
+</div>
+
+<div class="stat-label">
+Accuracy
+</div>
+
+</div>
+
+
+</section>
+
+
+
+<!-- ==================================================
+     STUDY CARD
+================================================== -->
+
+<main class="study-card">
+
+
+<div class="progress-track">
+
+<div
+id="progressBar"
+class="progress-bar">
+</div>
+
+</div>
+
+
+
+<div id="quizArea">
+
+
+<div class="card-header">
+
+<div
+id="questionType"
+class="question-type">
+
+Name → Formula
+
+</div>
+
+<div
+id="questionNumber"
+class="question-number">
+
+Question 1
+
+</div>
+
+</div>
+
+
+
+<div class="card-body">
+
+
+<div
+id="promptLabel"
+class="prompt-label">
+
+Ion Name
+
+</div>
+
+
+
+<div
+id="prompt"
+class="prompt name-prompt">
+
+Sulfate
+
+</div>
+
+
+
+<div class="answer-area">
+
+
+<label for="answerInput">
+
+Your Answer
+
+</label>
+
+
+<input
+id="answerInput"
+type="text"
+autocomplete="off"
+autocapitalize="off"
+spellcheck="false"
+placeholder="Type your answer"
+>
+
+
+<div
+id="answerHelp"
+class="answer-help">
+
+Element symbols are case-sensitive.
+
+</div>
+
+
+
+<div class="answer-buttons">
+
+
+<button
+id="checkButton"
+class="primary-button"
+type="button">
+
+Check Answer
+
+</button>
+
+
+<button
+id="revealButton"
+class="reveal-button"
+type="button">
+
+Reveal Answer
+
+</button>
+
+
+</div>
+
+
+</div>
+
+
+
+<div
+id="feedback"
+class="feedback"
+aria-live="polite">
+
+</div>
+
+
+
+<div
+id="nextButtons"
+class="next-buttons">
+
+
+<button
+id="nextButton"
+class="primary-button"
+type="button">
+
+Next Question
+
+</button>
+
+
+<button
+id="retryButton"
+class="secondary-button"
+type="button">
+
+Try Again
+
+</button>
+
+
+</div>
+
+
+</div>
+
+</div>
+
+
+
+<!-- ==================================================
+     COMPLETION SCREEN
+================================================== -->
+
+<div
+id="completion"
+class="completion">
+
+
+<h2>
+Deck Complete!
+</h2>
+
+
+<p id="completionText">
+</p>
+
+
+<button
+id="studyAgainButton"
+class="primary-button"
+type="button">
+
+Study Again
+
+</button>
+
+
+</div>
+
+
+</main>
+
+
+</div>
+
+
+
+<script>
+
+/* =====================================================
+   POLYATOMIC ION DATABASE
+=====================================================
+
+html:
+Controls how the formula is DISPLAYED.
+
+formula:
+Controls the correct keyboard answer.
+
+Example:
+
+html:
+SO<sub>4</sub><sup>2−</sup>
+
+displays:
+
+SO₄²⁻
+
+formula:
+
+SO4^2-
+
+is what students may type.
+
+===================================================== */
+
+
+const ions = [
+
+
+/* =====================================================
+   OXYANIONS
+===================================================== */
+
+
+{
+    name: "borate",
+
+    html:
+    "BO<sub>3</sub><sup>3−</sup>",
+
+    formulas:
+    ["BO3^3-"],
+
+    names:
+    ["borate"],
+
+    group:
+    "oxyanions"
+},
+
+
+{
+    name: "carbonate",
+
+    html:
+    "CO<sub>3</sub><sup>2−</sup>",
+
+    formulas:
+    ["CO3^2-"],
+
+    names:
+    ["carbonate"],
+
+    group:
+    "oxyanions"
+},
+
+
+{
+    name: "nitrate",
+
+    html:
+    "NO<sub>3</sub><sup>−</sup>",
+
+    formulas:
+    ["NO3^-"],
+
+    names:
+    ["nitrate"],
+
+    group:
+    "oxyanions"
+},
+
+
+{
+    name: "silicate",
+
+    html:
+    "SiO<sub>3</sub><sup>2−</sup>",
+
+    formulas:
+    ["SiO3^2-"],
+
+    names:
+    ["silicate"],
+
+    group:
+    "oxyanions"
+},
+
+
+{
+    name: "phosphate",
+
+    html:
+    "PO<sub>4</sub><sup>3−</sup>",
+
+    formulas:
+    ["PO4^3-"],
+
+    names:
+    ["phosphate"],
+
+    group:
+    "oxyanions"
+},
+
+
+{
+    name: "sulfate",
+
+    html:
+    "SO<sub>4</sub><sup>2−</sup>",
+
+    formulas:
+    ["SO4^2-"],
+
+    names:
+    ["sulfate"],
+
+    group:
+    "oxyanions"
+},
+
+
+{
+    name: "chlorate",
+
+    html:
+    "ClO<sub>3</sub><sup>−</sup>",
+
+    formulas:
+    ["ClO3^-"],
+
+    names:
+    ["chlorate"],
+
+    group:
+    "oxyanions"
+},
+
+
+{
+    name: "arsenate",
+
+    html:
+    "AsO<sub>4</sub><sup>3−</sup>",
+
+    formulas:
+    ["AsO4^3-"],
+
+    names:
+    ["arsenate"],
+
+    group:
+    "oxyanions"
+},
+
+
+{
+    name: "selenate",
+
+    html:
+    "SeO<sub>4</sub><sup>2−</sup>",
+
+    formulas:
+    ["SeO4^2-"],
+
+    names:
+    ["selenate"],
+
+    group:
+    "oxyanions"
+},
+
+
+{
+    name: "bromate",
+
+    html:
+    "BrO<sub>3</sub><sup>−</sup>",
+
+    formulas:
+    ["BrO3^-"],
+
+    names:
+    ["bromate"],
+
+    group:
+    "oxyanions"
+},
+
+
+{
+    name: "tellurate",
+
+    html:
+    "TeO<sub>4</sub><sup>2−</sup>",
+
+    formulas:
+    ["TeO4^2-"],
+
+    names:
+    ["tellurate"],
+
+    group:
+    "oxyanions"
+},
+
+
+{
+    name: "iodate",
+
+    html:
+    "IO<sub>3</sub><sup>−</sup>",
+
+    formulas:
+    ["IO3^-"],
+
+    names:
+    ["iodate"],
+
+    group:
+    "oxyanions"
+},
+
+
+
+/* =====================================================
+   OTHER COMMON POLYATOMIC IONS
+===================================================== */
+
+
+{
+    name: "hydronium",
+
+    html:
+    "H<sub>3</sub>O<sup>+</sup>",
+
+    formulas:
+    ["H3O^+"],
+
+    names:
+    ["hydronium"],
+
+    group:
+    "common"
+},
+
+
+{
+    name: "ammonium",
+
+    html:
+    "NH<sub>4</sub><sup>+</sup>",
+
+    formulas:
+    ["NH4^+"],
+
+    names:
+    ["ammonium"],
+
+    group:
+    "common"
+},
+
+
+{
+    name: "mercury(I)",
+
+    html:
+    "Hg<sub>2</sub><sup>2+</sup>",
+
+    formulas:
+    ["Hg2^2+"],
+
+    names:
+    [
+        "mercury(I)",
+        "mercury (I)",
+        "mercury 1"
+    ],
+
+    group:
+    "common"
+},
+
+
+{
+    name: "hydroxide",
+
+    html:
+    "OH<sup>−</sup>",
+
+    formulas:
+    ["OH^-"],
+
+    names:
+    ["hydroxide"],
+
+    group:
+    "common"
+},
+
+
+{
+    name: "cyanide",
+
+    html:
+    "CN<sup>−</sup>",
+
+    formulas:
+    ["CN^-"],
+
+    names:
+    ["cyanide"],
+
+    group:
+    "common"
+},
+
+
+{
+    name: "peroxide",
+
+    html:
+    "O<sub>2</sub><sup>2−</sup>",
+
+    formulas:
+    ["O2^2-"],
+
+    names:
+    ["peroxide"],
+
+    group:
+    "common"
+},
+
+
+{
+    name: "permanganate",
+
+    html:
+    "MnO<sub>4</sub><sup>−</sup>",
+
+    formulas:
+    ["MnO4^-"],
+
+    names:
+    ["permanganate"],
+
+    group:
+    "common"
+},
+
+
+{
+    name: "chromate",
+
+    html:
+    "CrO<sub>4</sub><sup>2−</sup>",
+
+    formulas:
+    ["CrO4^2-"],
+
+    names:
+    ["chromate"],
+
+    group:
+    "common"
+},
+
+
+{
+    name: "dichromate",
+
+    html:
+    "Cr<sub>2</sub>O<sub>7</sub><sup>2−</sup>",
+
+    formulas:
+    ["Cr2O7^2-"],
+
+    names:
+    ["dichromate"],
+
+    group:
+    "common"
+},
+
+
+{
+    name: "oxalate",
+
+    html:
+    "C<sub>2</sub>O<sub>4</sub><sup>2−</sup>",
+
+    formulas:
+    ["C2O4^2-"],
+
+    names:
+    ["oxalate"],
+
+    group:
+    "common"
+},
+
+
+{
+    name: "acetate",
+
+    html:
+    "C<sub>2</sub>H<sub>3</sub>O<sub>2</sub><sup>−</sup>",
+
+    formulas:
+    [
+        "C2H3O2^-",
+        "CH3COO^-"
+    ],
+
+    names:
+    ["acetate"],
+
+    group:
+    "common",
+
+    alternateHTML:
+    "CH<sub>3</sub>COO<sup>−</sup>"
+},
+
+
+
+/* =====================================================
+   NAMING RULE IONS
+===================================================== */
+
+
+{
+    name: "perchlorate",
+
+    html:
+    "ClO<sub>4</sub><sup>−</sup>",
+
+    formulas:
+    ["ClO4^-"],
+
+    names:
+    ["perchlorate"],
+
+    group:
+    "rules"
+},
+
+
+{
+    name: "chlorite",
+
+    html:
+    "ClO<sub>2</sub><sup>−</sup>",
+
+    formulas:
+    ["ClO2^-"],
+
+    names:
+    ["chlorite"],
+
+    group:
+    "rules"
+},
+
+
+{
+    name: "hypochlorite",
+
+    html:
+    "ClO<sup>−</sup>",
+
+    formulas:
+    ["ClO^-"],
+
+    names:
+    ["hypochlorite"],
+
+    group:
+    "rules"
+},
+
+
+{
+    name: "thiosulfate",
+
+    html:
+    "S<sub>2</sub>O<sub>3</sub><sup>2−</sup>",
+
+    formulas:
+    ["S2O3^2-"],
+
+    names:
+    ["thiosulfate"],
+
+    group:
+    "rules"
+},
+
+
+{
+    name: "hydrogenphosphate",
+
+    html:
+    "HPO<sub>4</sub><sup>2−</sup>",
+
+    formulas:
+    ["HPO4^2-"],
+
+    names:
+    [
+        "hydrogenphosphate",
+        "hydrogen phosphate"
+    ],
+
+    group:
+    "rules"
+},
+
+
+{
+    name: "dihydrogenphosphate",
+
+    html:
+    "H<sub>2</sub>PO<sub>4</sub><sup>−</sup>",
+
+    formulas:
+    ["H2PO4^-"],
+
+    names:
+    [
+        "dihydrogenphosphate",
+        "dihydrogen phosphate"
+    ],
+
+    group:
+    "rules"
+},
+
+
+
+/* =====================================================
+   ADDITIONAL POLYATOMIC ION FROM SOLUBILITY TABLE
+===================================================== */
+
+
+{
+    name: "sulfite",
+
+    html:
+    "SO<sub>3</sub><sup>2−</sup>",
+
+    formulas:
+    ["SO3^2-"],
+
+    names:
+    ["sulfite"],
+
+    group:
+    "solubility"
+}
+
+
+];
+
+
+
+/* =====================================================
+   PAGE ELEMENTS
+===================================================== */
+
+
+const modeSelect =
+document.getElementById("modeSelect");
+
+
+const groupSelect =
+document.getElementById("groupSelect");
+
+
+const restartButton =
+document.getElementById("restartButton");
+
+
+const scoreValue =
+document.getElementById("scoreValue");
+
+
+const streakValue =
+document.getElementById("streakValue");
+
+
+const remainingValue =
+document.getElementById("remainingValue");
+
+
+const accuracyValue =
+document.getElementById("accuracyValue");
+
+
+const quizArea =
+document.getElementById("quizArea");
+
+
+const completion =
+document.getElementById("completion");
+
+
+const completionText =
+document.getElementById("completionText");
+
+
+const questionType =
+document.getElementById("questionType");
+
+
+const questionNumber =
+document.getElementById("questionNumber");
+
+
+const promptLabel =
+document.getElementById("promptLabel");
+
+
+const prompt =
+document.getElementById("prompt");
+
+
+const answerInput =
+document.getElementById("answerInput");
+
+
+const answerHelp =
+document.getElementById("answerHelp");
+
+
+const checkButton =
+document.getElementById("checkButton");
+
+
+const revealButton =
+document.getElementById("revealButton");
+
+
+const feedback =
+document.getElementById("feedback");
+
+
+const nextButtons =
+document.getElementById("nextButtons");
+
+
+const nextButton =
+document.getElementById("nextButton");
+
+
+const retryButton =
+document.getElementById("retryButton");
+
+
+const studyAgainButton =
+document.getElementById("studyAgainButton");
+
+
+const progressBar =
+document.getElementById("progressBar");
+
+
+
+/* =====================================================
+   QUIZ STATE
+===================================================== */
+
+
+let deck = [];
+
+let currentIndex = 0;
+
+let currentQuestion = null;
+
+let correctCount = 0;
+
+let totalAttempts = 0;
+
+let streak = 0;
+
+let answered = false;
+
+let missedCurrentQuestion = false;
+
+
+
+/* =====================================================
+   SHUFFLE
+===================================================== */
+
+
+function shuffle(array) {
+
+    const copy = [...array];
+
+
+    for (
+        let i = copy.length - 1;
+        i > 0;
+        i--
+    ) {
+
+        const randomIndex =
+        Math.floor(
+            Math.random() *
+            (i + 1)
+        );
+
+
+        [
+            copy[i],
+            copy[randomIndex]
+        ]
+        =
+        [
+            copy[randomIndex],
+            copy[i]
+        ];
+
+    }
+
+
+    return copy;
+
+}
+
+
+
+/* =====================================================
+   NORMALIZE ION NAMES
+===================================================== */
+
+
+function normalizeName(value) {
+
+    return value
+
+    .toLowerCase()
+
+    .trim()
+
+    .replace(
+        /\s+/g,
+        " "
+    )
+
+    .replace(
+        /\s*\(\s*/g,
+        "("
+    )
+
+    .replace(
+        /\s*\)\s*/g,
+        ")"
+    );
+
+}
+
+
+
+/* =====================================================
+   NORMALIZE FORMULAS
+=====================================================
+
+IMPORTANT:
+
+Letter capitalization is intentionally NOT changed.
+
+Therefore:
+
+SO4^2-
+
+is correct.
+
+so4^2-
+
+is incorrect.
+
+ClO3^-
+
+is correct.
+
+CLO3^-
+
+is incorrect.
+
+===================================================== */
+
+
+function normalizeFormula(value) {
+
+
+    const subscripts = {
+
+        "₀": "0",
+        "₁": "1",
+        "₂": "2",
+        "₃": "3",
+        "₄": "4",
+        "₅": "5",
+        "₆": "6",
+        "₇": "7",
+        "₈": "8",
+        "₉": "9"
+
     };
 
-    const input = document.getElementById("ionInput");
-    const ionList = document.getElementById("ionList");
-    const findButton = document.getElementById("findButton");
-    const clearButton = document.getElementById("clearButton");
-    const result = document.getElementById("result");
-    const resultName = document.getElementById("resultName");
-    const formula = document.getElementById("formula");
-    const charge = document.getElementById("charge");
-    const message = document.getElementById("message");
 
-    Object.keys(ions)
-      .sort()
-      .forEach(function (ionName) {
-        const option = document.createElement("option");
-        option.value = ionName;
-        ionList.appendChild(option);
-      });
+    const superscripts = {
 
-    function normalizeName(value) {
-      return value
-        .toLowerCase()
-        .trim()
-        .replace(/\s+/g, " ");
+        "⁰": "0",
+        "¹": "1",
+        "²": "2",
+        "³": "3",
+        "⁴": "4",
+        "⁵": "5",
+        "⁶": "6",
+        "⁷": "7",
+        "⁸": "8",
+        "⁹": "9",
+
+        "⁺": "+",
+        "⁻": "-"
+
+    };
+
+
+    let formula =
+    value.trim();
+
+
+    formula =
+    formula.replace(
+
+        /[₀₁₂₃₄₅₆₇₈₉]/g,
+
+        character =>
+        subscripts[character]
+
+    );
+
+
+    formula =
+    formula.replace(
+
+        /[⁰¹²³⁴⁵⁶⁷⁸⁹⁺⁻]/g,
+
+        character =>
+        superscripts[character]
+
+    );
+
+
+    formula =
+    formula.replace(
+        /[−–—]/g,
+        "-"
+    );
+
+
+    formula =
+    formula.replace(
+        /\s+/g,
+        ""
+    );
+
+
+    /*
+
+    DO NOT use:
+
+    .toUpperCase()
+
+    here.
+
+    Doing so would incorrectly allow:
+
+    so4
+
+    instead of:
+
+    SO4
+
+    */
+
+
+    return formula;
+
+}
+
+
+
+/* =====================================================
+   GENERATE ACCEPTABLE FORMULA VARIANTS
+===================================================== */
+
+
+function formulaVariants(correctFormula) {
+
+
+    const variants =
+    new Set();
+
+
+    const formula =
+    normalizeFormula(
+        correctFormula
+    );
+
+
+    /* canonical */
+
+    variants.add(
+        formula
+    );
+
+
+    /* remove caret */
+
+    variants.add(
+        formula.replace(
+            "^",
+            ""
+        )
+    );
+
+
+    /*
+
+    Separate formula from ionic charge.
+
+    Example:
+
+    SO4^2-
+
+    becomes:
+
+    base = SO4
+
+    magnitude = 2
+
+    sign = -
+
+    */
+
+    const match =
+    formula.match(
+        /^(.*)\^(\d*)([+-])$/
+    );
+
+
+    if (match) {
+
+
+        const base =
+        match[1];
+
+
+        const magnitude =
+        match[2] || "1";
+
+
+        const sign =
+        match[3];
+
+
+        /* SO4^2- */
+
+        variants.add(
+
+            base +
+            "^" +
+            (
+                magnitude === "1"
+                ? ""
+                : magnitude
+            ) +
+            sign
+
+        );
+
+
+        /* SO4^2- */
+
+        variants.add(
+
+            base +
+            "^" +
+            magnitude +
+            sign
+
+        );
+
+
+        /* SO42- */
+
+        variants.add(
+
+            base +
+            (
+                magnitude === "1"
+                ? ""
+                : magnitude
+            ) +
+            sign
+
+        );
+
+
+        /* NO3- */
+
+        if (
+            magnitude === "1"
+        ) {
+
+            variants.add(
+                base + sign
+            );
+
+        }
+
+
+        /* SO4-2 */
+
+        variants.add(
+
+            base +
+            sign +
+            (
+                magnitude === "1"
+                ? ""
+                : magnitude
+            )
+
+        );
+
     }
 
-    function showIon() {
-      const search = normalizeName(input.value);
 
-      if (ions[search]) {
-        const ion = ions[search];
+    return variants;
 
-        resultName.textContent = ion.name;
-        formula.innerHTML = ion.formula;
-        charge.textContent = "Charge: " + ion.charge;
+}
 
-        result.style.display = "block";
-        message.style.display = "none";
-      } else {
-        result.style.display = "none";
-        message.style.display = "block";
-      }
+
+
+/* =====================================================
+   CHECK FORMULA ANSWER
+===================================================== */
+
+
+function isFormulaCorrect(
+    studentAnswer,
+    ion
+) {
+
+
+    const student =
+    normalizeFormula(
+        studentAnswer
+    );
+
+
+    return ion.formulas.some(
+
+        correctFormula =>
+
+        formulaVariants(
+            correctFormula
+        )
+        .has(
+            student
+        )
+
+    );
+
+}
+
+
+
+/* =====================================================
+   CHECK NAME ANSWER
+===================================================== */
+
+
+function isNameCorrect(
+    studentAnswer,
+    ion
+) {
+
+
+    const student =
+    normalizeName(
+        studentAnswer
+    );
+
+
+    return ion.names.some(
+
+        correctName =>
+
+        normalizeName(
+            correctName
+        )
+        ===
+        student
+
+    );
+
+}
+
+
+
+/* =====================================================
+   FILTER IONS
+===================================================== */
+
+
+function getSelectedIons() {
+
+
+    const selectedGroup =
+    groupSelect.value;
+
+
+    if (
+        selectedGroup ===
+        "all"
+    ) {
+
+        return ions;
+
     }
 
-    function clearTool() {
-      input.value = "";
-      result.style.display = "none";
-      message.style.display = "none";
-      input.focus();
+
+    return ions.filter(
+
+        ion =>
+        ion.group ===
+        selectedGroup
+
+    );
+
+}
+
+
+
+/* =====================================================
+   CHOOSE QUESTION DIRECTION
+===================================================== */
+
+
+function chooseDirection() {
+
+
+    const mode =
+    modeSelect.value;
+
+
+    if (
+        mode ===
+        "mixed"
+    ) {
+
+
+        return (
+            Math.random() < .5
+        )
+
+        ? "nameToFormula"
+
+        : "formulaToName";
+
     }
 
-    findButton.addEventListener("click", showIon);
-    clearButton.addEventListener("click", clearTool);
 
-    input.addEventListener("keydown", function (event) {
-      if (event.key === "Enter") {
-        showIon();
-      }
-    });
+    return mode;
 
-    input.addEventListener("change", function () {
-      const search = normalizeName(input.value);
-      if (ions[search]) {
-        showIon();
-      }
-    });
-  </script>
+}
+
+
+
+/* =====================================================
+   BUILD STUDY DECK
+===================================================== */
+
+
+function buildDeck() {
+
+
+    return shuffle(
+        getSelectedIons()
+    )
+
+    .map(
+
+        ion => ({
+
+            ion: ion,
+
+            direction:
+            chooseDirection()
+
+        })
+
+    );
+
+}
+
+
+
+/* =====================================================
+   START SESSION
+===================================================== */
+
+
+function startSession() {
+
+
+    deck =
+    buildDeck();
+
+
+    currentIndex = 0;
+
+    correctCount = 0;
+
+    totalAttempts = 0;
+
+    streak = 0;
+
+    answered = false;
+
+    missedCurrentQuestion =
+    false;
+
+
+    completion.classList.remove(
+        "show"
+    );
+
+
+    quizArea.style.display =
+    "block";
+
+
+    showQuestion();
+
+    updateStats();
+
+}
+
+
+
+/* =====================================================
+   DISPLAY QUESTION
+===================================================== */
+
+
+function showQuestion() {
+
+
+    if (
+        currentIndex >=
+        deck.length
+    ) {
+
+        finishSession();
+
+        return;
+
+    }
+
+
+    currentQuestion =
+    deck[currentIndex];
+
+
+    answered =
+    false;
+
+
+    missedCurrentQuestion =
+    false;
+
+
+    const ion =
+    currentQuestion.ion;
+
+
+    const direction =
+    currentQuestion.direction;
+
+
+    questionNumber.textContent =
+
+    "Question " +
+
+    (currentIndex + 1) +
+
+    " of " +
+
+    deck.length;
+
+
+    feedback.className =
+    "feedback";
+
+
+    feedback.innerHTML =
+    "";
+
+
+    nextButtons.className =
+    "next-buttons";
+
+
+    answerInput.disabled =
+    false;
+
+
+    checkButton.disabled =
+    false;
+
+
+    revealButton.disabled =
+    false;
+
+
+    answerInput.value =
+    "";
+
+
+    /* ----------------------------------------------
+       NAME → FORMULA
+    ---------------------------------------------- */
+
+
+    if (
+        direction ===
+        "nameToFormula"
+    ) {
+
+
+        questionType.textContent =
+        "Name → Formula";
+
+
+        promptLabel.textContent =
+        "Ion Name";
+
+
+        prompt.className =
+        "prompt name-prompt";
+
+
+        prompt.textContent =
+        ion.name;
+
+
+        answerInput.placeholder =
+        "Type the chemical formula";
+
+
+        answerHelp.innerHTML =
+
+        "Element symbols are " +
+
+        "<strong>case-sensitive</strong>. " +
+
+        "For example, " +
+
+        "<code>SO4^2-</code> is correct, " +
+
+        "but <code>so4^2-</code> is not.";
+
+    }
+
+
+    /* ----------------------------------------------
+       FORMULA → NAME
+    ---------------------------------------------- */
+
+
+    else {
+
+
+        questionType.textContent =
+        "Formula → Name";
+
+
+        promptLabel.textContent =
+        "Chemical Formula";
+
+
+        prompt.className =
+        "prompt chem";
+
+
+        prompt.innerHTML =
+
+        "<span class='chem'>" +
+
+        ion.html +
+
+        "</span>";
+
+
+        answerInput.placeholder =
+        "Type the ion name";
+
+
+        answerHelp.textContent =
+
+        "Capitalization does not matter for ion names.";
+
+    }
+
+
+    updateStats();
+
+
+    answerInput.focus();
+
+}
+
+
+
+/* =====================================================
+   CHECK ANSWER
+===================================================== */
+
+
+function checkAnswer() {
+
+
+    if (answered) {
+
+        return;
+
+    }
+
+
+    const studentAnswer =
+    answerInput.value.trim();
+
+
+    if (
+        studentAnswer === ""
+    ) {
+
+
+        feedback.className =
+        "feedback revealed";
+
+
+        feedback.textContent =
+        "Enter an answer before checking.";
+
+
+        return;
+
+    }
+
+
+    const ion =
+    currentQuestion.ion;
+
+
+    const direction =
+    currentQuestion.direction;
+
+
+    let correct;
+
+
+    if (
+        direction ===
+        "nameToFormula"
+    ) {
+
+
+        correct =
+        isFormulaCorrect(
+            studentAnswer,
+            ion
+        );
+
+    }
+
+
+    else {
+
+
+        correct =
+        isNameCorrect(
+            studentAnswer,
+            ion
+        );
+
+    }
+
+
+    totalAttempts++;
+
+
+
+    /* ----------------------------------------------
+       CORRECT
+    ---------------------------------------------- */
+
+
+    if (correct) {
+
+
+        answered =
+        true;
+
+
+        if (
+            !missedCurrentQuestion
+        ) {
+
+
+            correctCount++;
+
+            streak++;
+
+        }
+
+
+        answerInput.disabled =
+        true;
+
+
+        checkButton.disabled =
+        true;
+
+
+        revealButton.disabled =
+        true;
+
+
+        let alternate =
+        "";
+
+
+        if (
+            ion.alternateHTML
+        ) {
+
+
+            alternate =
+
+            "<br><br>" +
+
+            "Also written: " +
+
+            "<span class='chem'>" +
+
+            ion.alternateHTML +
+
+            "</span>";
+
+        }
+
+
+        feedback.className =
+        "feedback correct";
+
+
+        feedback.innerHTML =
+
+        "<strong>Correct!</strong>" +
+
+        "<br><br>" +
+
+        ion.name +
+
+        " = " +
+
+        "<span class='chem'>" +
+
+        ion.html +
+
+        "</span>" +
+
+        alternate;
+
+
+        nextButtons.className =
+        "next-buttons show";
+
+    }
+
+
+
+    /* ----------------------------------------------
+       INCORRECT
+    ---------------------------------------------- */
+
+
+    else {
+
+
+        missedCurrentQuestion =
+        true;
+
+
+        streak = 0;
+
+
+        feedback.className =
+        "feedback incorrect";
+
+
+        if (
+            direction ===
+            "nameToFormula"
+        ) {
+
+
+            feedback.innerHTML =
+
+            "<strong>Not quite.</strong>" +
+
+            "<br><br>" +
+
+            "Check the formula, ionic charge, " +
+
+            "and capitalization of each element symbol." +
+
+            "<br><br>" +
+
+            "Remember: element symbols are case-sensitive.";
+
+        }
+
+
+        else {
+
+
+            feedback.innerHTML =
+
+            "<strong>Not quite.</strong>" +
+
+            "<br><br>" +
+
+            "Check the ion name and try again.";
+
+        }
+
+
+        answerInput.select();
+
+    }
+
+
+    updateStats();
+
+}
+
+
+
+/* =====================================================
+   REVEAL ANSWER
+===================================================== */
+
+
+function revealAnswer() {
+
+
+    if (answered) {
+
+        return;
+
+    }
+
+
+    const ion =
+    currentQuestion.ion;
+
+
+    answered =
+    true;
+
+
+    missedCurrentQuestion =
+    true;
+
+
+    streak = 0;
+
+
+    totalAttempts++;
+
+
+    answerInput.disabled =
+    true;
+
+
+    checkButton.disabled =
+    true;
+
+
+    revealButton.disabled =
+    true;
+
+
+    feedback.className =
+    "feedback revealed";
+
+
+    if (
+        currentQuestion.direction ===
+        "nameToFormula"
+    ) {
+
+
+        let alternate =
+        "";
+
+
+        if (
+            ion.alternateHTML
+        ) {
+
+
+            alternate =
+
+            "<br><br>" +
+
+            "Also written: " +
+
+            "<span class='chem'>" +
+
+            ion.alternateHTML +
+
+            "</span>";
+
+        }
+
+
+        feedback.innerHTML =
+
+        "<strong>Answer:</strong>" +
+
+        "<br><br>" +
+
+        "<span class='chem'>" +
+
+        ion.html +
+
+        "</span>" +
+
+        alternate;
+
+    }
+
+
+    else {
+
+
+        feedback.innerHTML =
+
+        "<strong>Answer:</strong>" +
+
+        "<br><br>" +
+
+        ion.name;
+
+    }
+
+
+    nextButtons.className =
+    "next-buttons show";
+
+
+    updateStats();
+
+}
+
+
+
+/* =====================================================
+   NEXT QUESTION
+===================================================== */
+
+
+function nextQuestion() {
+
+
+    currentIndex++;
+
+
+    showQuestion();
+
+}
+
+
+
+/* =====================================================
+   TRY CURRENT QUESTION AGAIN
+===================================================== */
+
+
+function retryQuestion() {
+
+
+    answered =
+    false;
+
+
+    answerInput.disabled =
+    false;
+
+
+    checkButton.disabled =
+    false;
+
+
+    revealButton.disabled =
+    false;
+
+
+    answerInput.value =
+    "";
+
+
+    feedback.className =
+    "feedback";
+
+
+    feedback.innerHTML =
+    "";
+
+
+    nextButtons.className =
+    "next-buttons";
+
+
+    answerInput.focus();
+
+}
+
+
+
+/* =====================================================
+   UPDATE STATISTICS
+===================================================== */
+
+
+function updateStats() {
+
+
+    scoreValue.textContent =
+
+    correctCount +
+
+    " / " +
+
+    deck.length;
+
+
+
+    streakValue.textContent =
+    streak;
+
+
+
+    const remaining =
+
+    Math.max(
+
+        deck.length -
+        currentIndex,
+
+        0
+
+    );
+
+
+    remainingValue.textContent =
+    remaining;
+
+
+
+    if (
+        totalAttempts === 0
+    ) {
+
+
+        accuracyValue.textContent =
+        "—";
+
+    }
+
+
+    else {
+
+
+        const percentage =
+
+        Math.round(
+
+            (
+                correctCount /
+                totalAttempts
+            )
+
+            * 100
+
+        );
+
+
+        accuracyValue.textContent =
+
+        percentage +
+
+        "%";
+
+    }
+
+
+
+    if (
+        deck.length > 0
+    ) {
+
+
+        const completed =
+
+        Math.min(
+
+            currentIndex,
+
+            deck.length
+
+        );
+
+
+        progressBar.style.width =
+
+        (
+            completed /
+            deck.length *
+            100
+        )
+
+        + "%";
+
+    }
+
+}
+
+
+
+/* =====================================================
+   FINISH SESSION
+===================================================== */
+
+
+function finishSession() {
+
+
+    quizArea.style.display =
+    "none";
+
+
+    completion.classList.add(
+        "show"
+    );
+
+
+    progressBar.style.width =
+    "100%";
+
+
+    let accuracy = 0;
+
+
+    if (
+        totalAttempts > 0
+    ) {
+
+
+        accuracy =
+        Math.round(
+
+            correctCount /
+            totalAttempts *
+            100
+
+        );
+
+    }
+
+
+    completionText.textContent =
+
+    "You completed " +
+
+    deck.length +
+
+    " polyatomic ions. " +
+
+    "You earned " +
+
+    correctCount +
+
+    " correct points with an accuracy of " +
+
+    accuracy +
+
+    "%.";
+
+
+    updateStats();
+
+}
+
+
+
+/* =====================================================
+   EVENT LISTENERS
+===================================================== */
+
+
+checkButton.addEventListener(
+
+    "click",
+
+    checkAnswer
+
+);
+
+
+revealButton.addEventListener(
+
+    "click",
+
+    revealAnswer
+
+);
+
+
+nextButton.addEventListener(
+
+    "click",
+
+    nextQuestion
+
+);
+
+
+retryButton.addEventListener(
+
+    "click",
+
+    retryQuestion
+
+);
+
+
+restartButton.addEventListener(
+
+    "click",
+
+    startSession
+
+);
+
+
+studyAgainButton.addEventListener(
+
+    "click",
+
+    startSession
+
+);
+
+
+modeSelect.addEventListener(
+
+    "change",
+
+    startSession
+
+);
+
+
+groupSelect.addEventListener(
+
+    "change",
+
+    startSession
+
+);
+
+
+
+/* =====================================================
+   ENTER KEY
+===================================================== */
+
+
+answerInput.addEventListener(
+
+    "keydown",
+
+    function(event) {
+
+
+        if (
+            event.key ===
+            "Enter"
+        ) {
+
+
+            event.preventDefault();
+
+
+            if (answered) {
+
+
+                nextQuestion();
+
+            }
+
+
+            else {
+
+
+                checkAnswer();
+
+            }
+
+        }
+
+    }
+
+);
+
+
+
+/* =====================================================
+   START TOOL
+===================================================== */
+
+
+startSession();
+
+
+</script>
+
 </body>
 </html>
