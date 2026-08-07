@@ -1,0 +1,642 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>Polyatomic Ion Formula Finder</title>
+
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: Arial, Helvetica, sans-serif;
+      background: #f3f5f7;
+      color: #222;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      min-height: 100vh;
+      padding: 40px 20px;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 650px;
+      background: white;
+      border-radius: 14px;
+      padding: 30px;
+      box-shadow: 0 4px 18px rgba(0,0,0,0.12);
+    }
+
+    h1 {
+      margin-top: 0;
+      text-align: center;
+      font-size: 30px;
+    }
+
+    .subtitle {
+      text-align: center;
+      color: #666;
+      margin-bottom: 25px;
+    }
+
+    label {
+      display: block;
+      font-size: 18px;
+      font-weight: bold;
+      margin-bottom: 8px;
+    }
+
+    .search-wrapper {
+      position: relative;
+    }
+
+    input {
+      width: 100%;
+      padding: 14px;
+      font-size: 18px;
+      border: 2px solid #ccc;
+      border-radius: 8px;
+      outline: none;
+    }
+
+    input:focus {
+      border-color: #4a76a8;
+    }
+
+    .suggestions {
+      position: absolute;
+      left: 0;
+      right: 0;
+      background: white;
+      border: 1px solid #ccc;
+      border-top: none;
+      max-height: 220px;
+      overflow-y: auto;
+      z-index: 10;
+      display: none;
+    }
+
+    .suggestion {
+      padding: 12px 14px;
+      cursor: pointer;
+      border-bottom: 1px solid #eee;
+    }
+
+    .suggestion:hover {
+      background: #eef4fb;
+    }
+
+    button {
+      width: 100%;
+      margin-top: 18px;
+      padding: 14px;
+      font-size: 18px;
+      font-weight: bold;
+      background: #244d76;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background: #193a59;
+    }
+
+    .result {
+      margin-top: 30px;
+      padding: 25px;
+      text-align: center;
+      border-radius: 10px;
+      background: #f4f8fc;
+      border: 2px solid #d6e3ef;
+      display: none;
+    }
+
+    .result-name {
+      font-size: 22px;
+      font-weight: bold;
+      margin-bottom: 15px;
+    }
+
+    .formula {
+      font-size: 44px;
+      font-weight: bold;
+      margin: 15px 0;
+      color: #153d63;
+    }
+
+    .charge {
+      font-size: 20px;
+      color: #555;
+    }
+
+    .not-found {
+      margin-top: 20px;
+      padding: 15px;
+      background: #fff1f1;
+      color: #9b1c1c;
+      border-radius: 8px;
+      display: none;
+      text-align: center;
+    }
+
+    .examples {
+      margin-top: 25px;
+      color: #666;
+      font-size: 14px;
+      text-align: center;
+    }
+
+    .clear-button {
+      background: #777;
+      margin-top: 10px;
+    }
+
+    .clear-button:hover {
+      background: #555;
+    }
+
+  </style>
+</head>
+
+<body>
+
+<div class="container">
+
+  <h1>Polyatomic Ion Formula Finder</h1>
+
+  <div class="subtitle">
+    Enter the name of a polyatomic ion to find its chemical formula.
+  </div>
+
+  <label for="ionInput">Polyatomic Ion Name</label>
+
+  <div class="search-wrapper">
+
+    <input
+      type="text"
+      id="ionInput"
+      placeholder="Example: sulfate"
+      autocomplete="off"
+    >
+
+    <div id="suggestions" class="suggestions"></div>
+
+  </div>
+
+  <button onclick="findIon()">Find Formula</button>
+
+  <button class="clear-button" onclick="clearTool()">Clear</button>
+
+  <div id="result" class="result">
+
+    <div id="resultName" class="result-name"></div>
+
+    <div id="formula" class="formula"></div>
+
+    <div id="charge" class="charge"></div>
+
+  </div>
+
+  <div id="notFound" class="not-found">
+    Ion not found. Check the spelling and try again.
+  </div>
+
+  <div class="examples">
+    Try: sulfate, nitrate, ammonium, hydroxide, phosphate, carbonate, or acetate
+  </div>
+
+</div>
+
+
+<script>
+
+/*
+-------------------------------------------------
+POLYATOMIC ION DATABASE
+-------------------------------------------------
+
+To add another ion:
+
+"ion name": {
+    name: "Displayed Name",
+    formula: "HTML Formula",
+    charge: "Charge"
+}
+
+Use:
+<sub> for subscripts
+<sup> for superscripts
+
+Example:
+
+"carbonate": {
+    name: "Carbonate",
+    formula: "CO<sub>3</sub><sup>2−</sup>",
+    charge: "2−"
+}
+
+-------------------------------------------------
+*/
+
+const ions = {
+
+  "acetate": {
+    name: "Acetate",
+    formula: "C<sub>2</sub>H<sub>3</sub>O<sub>2</sub><sup>−</sup>",
+    charge: "1−"
+  },
+
+  "ammonium": {
+    name: "Ammonium",
+    formula: "NH<sub>4</sub><sup>+</sup>",
+    charge: "1+"
+  },
+
+  "carbonate": {
+    name: "Carbonate",
+    formula: "CO<sub>3</sub><sup>2−</sup>",
+    charge: "2−"
+  },
+
+  "hydrogen carbonate": {
+    name: "Hydrogen Carbonate",
+    formula: "HCO<sub>3</sub><sup>−</sup>",
+    charge: "1−"
+  },
+
+  "bicarbonate": {
+    name: "Hydrogen Carbonate (Bicarbonate)",
+    formula: "HCO<sub>3</sub><sup>−</sup>",
+    charge: "1−"
+  },
+
+  "hydroxide": {
+    name: "Hydroxide",
+    formula: "OH<sup>−</sup>",
+    charge: "1−"
+  },
+
+  "nitrate": {
+    name: "Nitrate",
+    formula: "NO<sub>3</sub><sup>−</sup>",
+    charge: "1−"
+  },
+
+  "nitrite": {
+    name: "Nitrite",
+    formula: "NO<sub>2</sub><sup>−</sup>",
+    charge: "1−"
+  },
+
+  "sulfate": {
+    name: "Sulfate",
+    formula: "SO<sub>4</sub><sup>2−</sup>",
+    charge: "2−"
+  },
+
+  "sulfite": {
+    name: "Sulfite",
+    formula: "SO<sub>3</sub><sup>2−</sup>",
+    charge: "2−"
+  },
+
+  "hydrogen sulfate": {
+    name: "Hydrogen Sulfate",
+    formula: "HSO<sub>4</sub><sup>−</sup>",
+    charge: "1−"
+  },
+
+  "bisulfate": {
+    name: "Hydrogen Sulfate (Bisulfate)",
+    formula: "HSO<sub>4</sub><sup>−</sup>",
+    charge: "1−"
+  },
+
+  "phosphate": {
+    name: "Phosphate",
+    formula: "PO<sub>4</sub><sup>3−</sup>",
+    charge: "3−"
+  },
+
+  "hydrogen phosphate": {
+    name: "Hydrogen Phosphate",
+    formula: "HPO<sub>4</sub><sup>2−</sup>",
+    charge: "2−"
+  },
+
+  "dihydrogen phosphate": {
+    name: "Dihydrogen Phosphate",
+    formula: "H<sub>2</sub>PO<sub>4</sub><sup>−</sup>",
+    charge: "1−"
+  },
+
+  "chlorate": {
+    name: "Chlorate",
+    formula: "ClO<sub>3</sub><sup>−</sup>",
+    charge: "1−"
+  },
+
+  "chlorite": {
+    name: "Chlorite",
+    formula: "ClO<sub>2</sub><sup>−</sup>",
+    charge: "1−"
+  },
+
+  "hypochlorite": {
+    name: "Hypochlorite",
+    formula: "ClO<sup>−</sup>",
+    charge: "1−"
+  },
+
+  "perchlorate": {
+    name: "Perchlorate",
+    formula: "ClO<sub>4</sub><sup>−</sup>",
+    charge: "1−"
+  },
+
+  "bromate": {
+    name: "Bromate",
+    formula: "BrO<sub>3</sub><sup>−</sup>",
+    charge: "1−"
+  },
+
+  "iodate": {
+    name: "Iodate",
+    formula: "IO<sub>3</sub><sup>−</sup>",
+    charge: "1−"
+  },
+
+  "permanganate": {
+    name: "Permanganate",
+    formula: "MnO<sub>4</sub><sup>−</sup>",
+    charge: "1−"
+  },
+
+  "chromate": {
+    name: "Chromate",
+    formula: "CrO<sub>4</sub><sup>2−</sup>",
+    charge: "2−"
+  },
+
+  "dichromate": {
+    name: "Dichromate",
+    formula: "Cr<sub>2</sub>O<sub>7</sub><sup>2−</sup>",
+    charge: "2−"
+  },
+
+  "cyanide": {
+    name: "Cyanide",
+    formula: "CN<sup>−</sup>",
+    charge: "1−"
+  },
+
+  "peroxide": {
+    name: "Peroxide",
+    formula: "O<sub>2</sub><sup>2−</sup>",
+    charge: "2−"
+  },
+
+  "oxalate": {
+    name: "Oxalate",
+    formula: "C<sub>2</sub>O<sub>4</sub><sup>2−</sup>",
+    charge: "2−"
+  },
+
+  "thiocyanate": {
+    name: "Thiocyanate",
+    formula: "SCN<sup>−</sup>",
+    charge: "1−"
+  },
+
+  "cyanate": {
+    name: "Cyanate",
+    formula: "OCN<sup>−</sup>",
+    charge: "1−"
+  },
+
+  "thiosulfate": {
+    name: "Thiosulfate",
+    formula: "S<sub>2</sub>O<sub>3</sub><sup>2−</sup>",
+    charge: "2−"
+  },
+
+  "borate": {
+    name: "Borate",
+    formula: "BO<sub>3</sub><sup>3−</sup>",
+    charge: "3−"
+  },
+
+  "silicate": {
+    name: "Silicate",
+    formula: "SiO<sub>3</sub><sup>2−</sup>",
+    charge: "2−"
+  },
+
+  "hydronium": {
+    name: "Hydronium",
+    formula: "H<sub>3</sub>O<sup>+</sup>",
+    charge: "1+"
+  }
+
+};
+
+
+/*
+-------------------------------------------------
+ELEMENT REFERENCES
+-------------------------------------------------
+*/
+
+const input = document.getElementById("ionInput");
+const suggestions = document.getElementById("suggestions");
+const result = document.getElementById("result");
+const resultName = document.getElementById("resultName");
+const formula = document.getElementById("formula");
+const charge = document.getElementById("charge");
+const notFound = document.getElementById("notFound");
+
+
+/*
+-------------------------------------------------
+AUTOCOMPLETE
+-------------------------------------------------
+*/
+
+input.addEventListener("input", function() {
+
+  const search = input.value
+    .toLowerCase()
+    .trim();
+
+  suggestions.innerHTML = "";
+
+  if (search.length === 0) {
+
+    suggestions.style.display = "none";
+    return;
+
+  }
+
+  const matches = Object.keys(ions).filter(name =>
+    name.includes(search)
+  );
+
+  if (matches.length === 0) {
+
+    suggestions.style.display = "none";
+    return;
+
+  }
+
+  matches.forEach(name => {
+
+    const item = document.createElement("div");
+
+    item.className = "suggestion";
+
+    item.textContent = ions[name].name;
+
+    item.addEventListener("click", function() {
+
+      input.value = name;
+
+      suggestions.style.display = "none";
+
+      displayIon(name);
+
+    });
+
+    suggestions.appendChild(item);
+
+  });
+
+  suggestions.style.display = "block";
+
+});
+
+
+/*
+-------------------------------------------------
+FIND ION
+-------------------------------------------------
+*/
+
+function findIon() {
+
+  let search = input.value
+    .toLowerCase()
+    .trim();
+
+  // Remove extra spaces
+  search = search.replace(/\s+/g, " ");
+
+  suggestions.style.display = "none";
+
+  if (ions[search]) {
+
+    displayIon(search);
+
+  } else {
+
+    result.style.display = "none";
+    notFound.style.display = "block";
+
+  }
+
+}
+
+
+/*
+-------------------------------------------------
+DISPLAY RESULT
+-------------------------------------------------
+*/
+
+function displayIon(name) {
+
+  const ion = ions[name];
+
+  resultName.textContent = ion.name;
+
+  formula.innerHTML = ion.formula;
+
+  charge.innerHTML =
+    "<strong>Charge:</strong> " + ion.charge;
+
+  notFound.style.display = "none";
+
+  result.style.display = "block";
+
+}
+
+
+/*
+-------------------------------------------------
+CLEAR TOOL
+-------------------------------------------------
+*/
+
+function clearTool() {
+
+  input.value = "";
+
+  result.style.display = "none";
+
+  notFound.style.display = "none";
+
+  suggestions.style.display = "none";
+
+  input.focus();
+
+}
+
+
+/*
+-------------------------------------------------
+ALLOW ENTER KEY
+-------------------------------------------------
+*/
+
+input.addEventListener("keydown", function(event) {
+
+  if (event.key === "Enter") {
+
+    event.preventDefault();
+
+    findIon();
+
+  }
+
+});
+
+
+/*
+-------------------------------------------------
+CLOSE AUTOCOMPLETE WHEN CLICKING ELSEWHERE
+-------------------------------------------------
+*/
+
+document.addEventListener("click", function(event) {
+
+  if (
+    !input.contains(event.target) &&
+    !suggestions.contains(event.target)
+  ) {
+
+    suggestions.style.display = "none";
+
+  }
+
+});
+
+</script>
+
+</body>
+</html>
