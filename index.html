@@ -238,6 +238,7 @@ html.dd-embedded{scroll-padding-top:8px}
 .ot-cell.done{border-style:solid;border-color:var(--mint-line);background:var(--mint)}.ot-cell.done.helped{background:#fff8e6;border-color:#f0d89a}
 .ot-cell .ot-f{font-size:1.02rem;font-weight:800}.ot-cell small{font-size:.72rem;color:var(--muted);font-weight:700}
 @media(max-width:420px){.ot-cell{min-height:60px}.ot-cell .ot-f{font-size:.9rem}.ot-cell small{font-size:.64rem}}
+/* iOS: no double-tap zoom when buttons are tapped quickly; pinch zoom still works (2026-11-14) */ html{touch-action:manipulation}
 </style>
 <script src="https://itsdrdan.github.io/games/track.js" defer></script>
 <link rel="stylesheet" href="https://itsdrdan.github.io/games/brand/itsdrdan.css">
@@ -1522,4 +1523,5 @@ document.addEventListener('dragover', e => { if (e.target.closest && e.target.cl
 document.addEventListener('drop', e => { const c = e.target.closest && e.target.closest('#otLab [data-otc]'); if (!c) return; e.preventDefault(); const i = e.dataTransfer.getData('text/plain'); if (i) otPlace(i, c.dataset.otc); });
 if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init); else init();
 </script>
+<script>/* iOS: a quick second tap on a button that just turned disabled must not zoom the page (2026-11-14) */document.addEventListener("touchend",e=>{const b=e.target&&e.target.closest&&e.target.closest("button");if(b&&b.disabled&&e.cancelable)e.preventDefault()},{passive:false});</script>
 </body></html>
