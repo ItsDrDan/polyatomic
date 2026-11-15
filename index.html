@@ -1020,7 +1020,7 @@ function loadCourse(c) { try { PALL = JSON.parse(localStorage.getItem(STORE) || 
 function save() { try { P.lastMode = state.mode; P.set = state.set; PALL[state.course] = P; PALL.last = state.course; localStorage.setItem(STORE, JSON.stringify(PALL)); } catch (e) {} }
 function paintIcons(root = document) { root.querySelectorAll('[data-icon]').forEach(el => { if (!el.dataset.painted && window.ddIcon) { el.insertAdjacentHTML('afterbegin', ico(el.dataset.icon)); el.dataset.painted = 1; } }); }
 const badgeImg = n => `<img src="${BADGE(n)}" alt="" loading="lazy" onerror="this.style.visibility='hidden'">`;
-const achImg = id => `<img src="assets/achievements/ach-${id}.webp" alt="" aria-hidden="true" loading="lazy" onerror="this.style.visibility='hidden'">`;
+const achImg = id => `<img src="assets/achievements/ach-${id}.webp" alt="" aria-hidden="true" onerror="this.style.visibility='hidden'">`;
 /* Sully's mood follows the feedback: good → correct, bad → oops, info/hint → thinking, new question → idle; victory for achievements and rank-ups */
 const SULLY_MOOD = { good: 'correct', bad: 'oops', info: 'thinking', '': 'idle' }; let sullyNow = 'idle', sullyHold = 0;
 const sullySrc = m => 'assets/mascot/sully-' + m + '.webp';
