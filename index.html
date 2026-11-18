@@ -258,8 +258,12 @@ html.dd-embedded{scroll-padding-top:8px}
 .ot-cell[class*="t43-"],.ox-table div[class*="t43-"]{background:var(--tc);border-color:var(--tl)}.ox-table div[class*="t43-"] b{color:var(--ti)}
 .ot-cell[class*="t43-"] .ot-el{color:var(--ti)}
 .ot-cell[class*="t43-"].sel{background:var(--tc);border-color:var(--accent);border-width:3px}
-.t43-key{display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin:0 0 8px;font-size:.88rem}.t43-key>b{color:var(--muted)}
-.t43-chip{display:inline-flex;align-items:baseline;gap:4px;background:var(--tc);border:1.5px solid var(--tl);color:var(--ti);border-radius:99px;padding:3px 10px;font-weight:700}.t43-chip b{font-size:1.05rem}.t43-chip small{font-weight:600;opacity:.8;margin-left:2px}
+.t43-key{border:1px solid var(--line);background:#fff;border-radius:14px;padding:10px 12px;margin:0 0 10px;max-width:600px;font-size:.9rem}
+.t43-head{margin:0 0 8px;line-height:1.35}.t43-q{margin:8px 0 0;font-size:.84rem;color:var(--muted);line-height:1.35}
+.t43-rows{list-style:none;margin:0;padding:0;display:grid;gap:6px}
+.t43-rows li{display:flex;align-items:center;gap:10px;background:var(--tc);border:1.5px solid var(--tl);border-radius:11px;padding:6px 10px;color:#2a2f45;line-height:1.3}
+.t43-rows li b{color:var(--ti)}.t43-rows small{display:block;color:var(--ti);opacity:.85;font-weight:700;font-size:.8rem}
+.t43-badge{flex:none;width:34px;height:34px;border-radius:9px;background:#fff;border:2px solid var(--tl);color:var(--ti);display:grid;place-items:center;font-family:var(--font-display);font-weight:700;font-size:1.25rem}
 .ot-cell{border:2px dashed var(--line2);background:#fff;border-radius:12px;min-height:68px;padding:4px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;color:#26326a}
 .ot-cell .ot-el{font-size:1.4rem;font-weight:800}
 .ot-cell.sel{border-style:solid;border-color:var(--accent);background:var(--accent-soft);box-shadow:0 0 0 3px #4b57d126}
@@ -267,7 +271,7 @@ html.dd-embedded{scroll-padding-top:8px}
 .ot-cell.done.helped{border-color:#e7c25e;box-shadow:inset 0 0 0 2px #f6e2a6}.ot-cell.done.helped::after{color:#a57a12}
 .ot-cell.done .ot-f{color:var(--ti,#26326a)}
 .ot-cell .ot-f{font-size:1.02rem;font-weight:800}.ot-cell small{font-size:.72rem;color:var(--muted);font-weight:700}
-@media(max-width:480px){.ot-grid{gap:4px}.ot-cell,.ot-blank{min-height:58px;border-radius:10px}.ot-cell .ot-el{font-size:1.2rem}.ot-cell .ot-f{font-size:.78rem;letter-spacing:-.02em}.ot-cell small{font-size:.56rem;overflow-wrap:anywhere}.ot-blank{font-size:.8rem}.t43-chip small{display:none}.ot-cell.done::after{display:none}}
+@media(max-width:480px){.ot-grid{gap:4px}.ot-cell,.ot-blank{min-height:58px;border-radius:10px}.ot-cell .ot-el{font-size:1.2rem}.ot-cell .ot-f{font-size:.78rem;letter-spacing:-.02em}.ot-cell small{font-size:.56rem;overflow-wrap:anywhere}.ot-blank{font-size:.8rem}.t43-key{font-size:.84rem;padding:9px 10px}.ot-cell.done::after{display:none}}
 /* iOS: no double-tap zoom when buttons are tapped quickly; pinch zoom still works (2026-11-14) */ html{touch-action:manipulation}
 </style>
 <script src="https://itsdrdan.github.io/games/track.js" defer></script>
@@ -997,7 +1001,7 @@ const OT_LAYOUT = ['borate', 'carbonate', 'nitrate', null, null,
 const OT_GHOST = ['', '', '', 'O', 'F', 'Al', '', '', '', '', 'Ga', 'Ge', '', '', '', 'In', 'Sn', 'Sb', '', ''];
 /* T43 method: the blue T (B, C, N + Si) = 3 O, the purple 4 (P, S, As, Se, Te) = 4 O, the pink 3 (Cl, Br, I) = 3 O */
 const T43 = { B: 'T', C: 'T', N: 'T', Si: 'T', P: '4', S: '4', As: '4', Se: '4', Te: '4', Cl: '3', Br: '3', I: '3' };
-const T43_KEY = [['T', 'T', '3 O', 'B, C, N, Si'], ['4', '4', '4 O', 'P, S, As, Se, Te'], ['3', '3', '3 O', 'Cl, Br, I']];
+const T43_KEY = [['T', 'T', 'the T shape', 'B, C, N, Si', '3 O', 'BO₃³⁻, CO₃²⁻, NO₃⁻, SiO₃²⁻'], ['4', '4', 'the 4 shape', 'P, S, As, Se, Te', '4 O', 'PO₄³⁻, SO₄²⁻, AsO₄³⁻…'], ['3', '3', 'the 3 shape', 'Cl, Br, I', '3 O', 'ClO₃⁻, BrO₃⁻, IO₃⁻']];
 const OT_IONS = OT_LAYOUT.filter(Boolean).map(n => byName(n));
 function otPat(ion) { const a = atomList(baseOf(ion)); return { el: a[0][0], o: (a.find(x => x[0] === 'O') || [0, 0])[1], q: chargeOf(ion) }; }
 const otKey = p => p.o + '|' + p.q;
@@ -1484,7 +1488,7 @@ function otCellHTML(ion, T) {
   const lab = c.done ? `${p.el}: ${ion.name}, ${baseOf(ion)} charge ${chargeTxt(p.q)}` : `${p.el}, empty${sel ? ', selected' : ''}`;
   return `<button type="button" class="ot-cell t43-${T43[p.el]}${c.done ? ' done' + (c.helped ? ' helped' : '') : ''}${sel ? ' sel' : ''}" data-otc="${ion.name}" aria-label="${lab}"${c.done ? ' aria-disabled="true"' : ''}>${c.done ? `<span class="ot-f">${chemHTML(ion)}</span><small>${ion.name}</small>` : `<span class="ot-el">${p.el}</span>`}</button>`;
 }
-const otKeyHTML = () => `<div class="t43-key" aria-label="T43 method color key"><b>T43 method:</b>${T43_KEY.map(k => `<span class="t43-chip t43-${k[0]}"><b>${k[1]}</b> = ${k[2]}<small>${k[3]}</small></span>`).join('')}</div>`;
+const otKeyHTML = () => `<div class="t43-key" role="note" aria-label="T43 method key"><p class="t43-head"><b>T43 key:</b> the colored cells trace a <b>T</b>, a <b>4</b> and a <b>3</b> on the periodic table. Each shape tells you how many O the -ate ion has.</p><ul class="t43-rows">${T43_KEY.map(k => `<li class="t43-${k[0]}"><span class="t43-badge" aria-hidden="true">${k[1]}</span><span><b>${k[1]} = ${k[4]}</b> · ${k[2]}: ${k[3]}<small>${k[5]}</small></span></li>`).join('')}</ul><p class="t43-q">Charge: use each column’s usual ion charge (P, As 3−; S, Se, Te 2−; Cl, Br, I 1−). The T runs backward: B 3−, C and Si 2−, N 1−.</p></div>`;
 function renderOT(focusInput) {
   const q = state.q, T = q.ot, box = $('otLab'); if (!box) return;
   box.hidden = false;
