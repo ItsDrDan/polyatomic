@@ -80,7 +80,7 @@ main.panel{padding:20px;margin-top:16px;scroll-margin-top:calc(var(--topbar) + 1
 .equation.name{font-family:var(--font-display);font-weight:600;font-size:clamp(1.7rem,6vw,2.6rem)}
 .equation .q{color:#c0577a}
 .prompt{font-size:1.2rem;line-height:1.5;font-weight:650;margin:0}
-.answer{display:flex;gap:10px;margin-top:14px;align-items:center;flex-wrap:wrap}
+.answer{display:flex;gap:10px;margin-top:14px;align-items:flex-start;flex-wrap:wrap}
 .answer input{flex:1;min-width:0;padding:12px 14px;font-size:1.45rem;min-height:58px;border:1.5px solid var(--line2);border-radius:12px;background:#fff;font-weight:700;letter-spacing:.02em}
 .answer input:focus{border-color:var(--accent);outline:none;box-shadow:0 0 0 4px #4b57d11f}
 .answer input:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
@@ -185,7 +185,7 @@ dialog{border:0;border-radius:18px;box-shadow:0 24px 80px #14173855;padding:0;wi
  .modes{grid-template-columns:1fr 1fr;gap:9px}.mode{min-height:0;padding:10px 8px 12px;gap:3px}.mode .ms-ico{width:42px;height:42px;font-size:1.25rem;border-radius:12px}.mode b{font-size:1rem}.mode small{font-size:.78rem}
  .skill-card{padding:10px 12px}.skill-card img{width:44px;height:44px}
  main.panel{padding:14px}.question{padding:12px}.prompt{font-size:1.08rem}
- .answer input{flex:1 1 100%}.answer .btn.primary{flex:1}.next-row .btn.primary{width:100%}
+ .answer input,.answer .ce{flex:1 1 100%}.answer .btn.primary{flex:1}.next-row .btn.primary{width:100%}
  .actions{gap:6px}.actions .btn{white-space:nowrap;font-size:.86rem;padding:8px 4px;gap:4px;min-width:0}
  .stat-row{grid-template-columns:1fr 1fr}.stat.rank{grid-column:1/-1}
  .sheet-grid{grid-template-columns:1fr}.ox-table{gap:4px}.ox-table div{font-size:.54rem;padding:5px 1px;overflow-wrap:normal;letter-spacing:-.01em}.ox-table b{font-size:.84rem}
@@ -224,6 +224,31 @@ html.dd-embedded{scroll-padding-top:8px}
 .modes{grid-template-columns:repeat(5,minmax(0,1fr))}
 @media(max-width:760px){.modes{grid-template-columns:1fr 1fr}.modes .mode:last-child:nth-child(odd){grid-column:1/-1}}
 .ot-lab{margin:6px 0 14px}
+/* smart formula editor */
+.ce{flex:1;min-width:0;display:flex;flex-direction:column;gap:7px}
+input.ce-src{display:none!important}
+.ce-field{display:flex;align-items:flex-start;gap:6px;border:1.5px solid #ddd0ea;border-radius:12px;background:#fff;min-height:58px;padding:5px 8px 5px 14px;cursor:text}
+.ce-field:focus-within{border-color:var(--accent);box-shadow:0 0 0 4px #6a4fd822}
+.ce .ce-main{flex:1;min-width:0;min-height:0;border:0;border-radius:0;box-shadow:none;outline:none;background:none;font-size:1.45rem;font-weight:700;letter-spacing:.02em;padding:6px 0;align-self:center;color:#26326a}
+.ce-cbox{display:flex;flex-direction:row;align-items:center;gap:6px;flex:none;align-self:flex-start;margin-top:1px}
+.ce-cbox small{order:-1;font-size:.64rem;font-weight:800;color:#9a86b5;text-transform:uppercase;letter-spacing:.06em;line-height:1}
+.ce-ico{font-style:normal;font-weight:800;font-size:1.05rem;color:#5a3c9b}.ce-ico b{font-size:.7em;vertical-align:.55em;margin-left:1px}
+.ce .ce-chg{flex:none;min-height:0;box-shadow:none;width:3.6em;height:32px;border:2px dashed var(--p-lav-l,#c4aeef);border-radius:8px;background:#faf7ff;font-size:1.06rem;font-weight:800;text-align:center;color:#5a3c9b;outline:none;padding:0 4px}
+.ce .ce-chg:focus{border-style:solid;border-color:var(--accent);background:#fff;box-shadow:none}
+.ce.has-chg .ce-chg{border-style:solid;background:#f1ebff}
+.ce-tools{display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.ce-tools button{display:inline-flex;align-items:center;gap:5px;border:1.5px solid #e3d6ee;background:#fff;border-radius:10px;min-height:40px;padding:4px 10px;font-weight:800;color:#4b3f5c;font-size:.95rem}
+.ce-tools button:hover{border-color:var(--p-lav-l,#c4aeef);background:#faf7ff}
+.ce-tools button span{font-size:.78rem;font-weight:700;color:#7a6a8a}
+.ce-q{display:inline-flex;gap:4px;flex-wrap:wrap;padding-left:6px;border-left:2px solid #efe6f6}
+.ce-q button{min-width:44px;justify-content:center;background:var(--p-lav,#efe8fd);border-color:var(--p-lav-l,#c4aeef);color:var(--p-lav-i,#5a3c9b)}
+.ce-q button.on{background:linear-gradient(135deg,#7b5ce3,#c45c9b);color:#fff;border-color:transparent}
+.ce-clear{margin-left:auto}
+.ce.tip-sub .ce-field::after{content:'Numbers after a letter turn into subscripts: SO4 → SO₄';position:absolute;transform:translateY(-130%);background:#3d2a6b;color:#fff;font-size:.8rem;font-weight:700;border-radius:8px;padding:4px 9px;pointer-events:none}
+.ce-field{position:relative}
+.ce.off{opacity:.7}
+.ot-row .ce{flex:1}
+@media(max-width:560px){.ce-cbox small{display:none}.ce .ce-main{font-size:1.25rem}.ce-tools button span{display:none}.ce-q{padding-left:0;border-left:0}.ce-clear{margin-left:0}}
 /* Learn with Dr. Dan: bottom video player (same layout as the other games) */
 .video-body{padding:0 20px 20px}.lesson-layout{display:grid;grid-template-columns:minmax(0,1.35fr) minmax(0,1fr);gap:18px}
 .lesson-player{aspect-ratio:16/9;background:#1e2538;border-radius:var(--r-md);overflow:hidden}.lesson-player iframe{width:100%;height:100%;border:0;display:block}
@@ -236,7 +261,7 @@ html.dd-embedded{scroll-padding-top:8px}
 .ot-seg button{border:0;background:none;border-radius:9px;padding:8px 14px;min-height:44px;font-weight:800;color:var(--muted)}
 .ot-seg button[aria-pressed="true"]{background:#fff;color:var(--accent-d);box-shadow:0 1px 3px #0002}
 .ot-count{margin:0 0 6px;font-weight:700;color:var(--muted);font-size:.9rem}
-.ot-type label{display:block;margin-bottom:6px}.ot-row{display:flex;gap:8px}.ot-row input{flex:1;min-width:0;font-size:1.15rem;padding:10px 12px;border:2px solid var(--line2);border-radius:12px;min-height:48px}
+.ot-type label{display:block;margin-bottom:6px}.ot-row{display:flex;gap:8px;align-items:flex-start}.ot-row>.btn{min-height:58px}.ot-row input{flex:1;min-width:0;font-size:1.15rem;padding:10px 12px;border:2px solid var(--line2);border-radius:12px;min-height:48px}
 .ot-row input:focus{outline:none;border-color:var(--accent)}
 .ot-tray{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 8px}
 .ot-tile{border:2px solid var(--line2);background:#fff;border-radius:12px;min-height:48px;min-width:64px;padding:6px 10px;font-size:1.15rem;font-weight:800;color:#26326a;cursor:grab}
@@ -1703,6 +1728,84 @@ setVideoFor(null, 't43_intro');
 document.addEventListener('dragstart', e => { const t = e.target.closest && e.target.closest('[data-ott]'); if (t) { e.dataTransfer.setData('text/plain', t.dataset.ott); e.dataTransfer.effectAllowed = 'move'; } });
 document.addEventListener('dragover', e => { if (e.target.closest && e.target.closest('#otLab [data-otc]')) e.preventDefault(); });
 document.addEventListener('drop', e => { const c = e.target.closest && e.target.closest('#otLab [data-otc]'); if (!c) return; e.preventDefault(); const i = e.dataTransfer.getData('text/plain'); if (i) otPlace(i, c.dataset.otc); });
+/* ---------- Smart formula editor: a formula box plus a raised charge box (like a math editor) ----------
+   It sits on top of the original text input, which stays the hidden source of truth, so grading is unchanged.
+   Formula box: numbers after a letter become subscripts; _ works too (SO_4). Typing ^, + or − jumps into the charge box.
+   Charge box: type 2- or -2 (shows 2−), or tap a charge button. Backspace in an empty charge box goes back. */
+const CE_QUICK = [-1, -2, -3, 1, 2];
+function ceChg(raw) {
+  const s = String(raw || '').replace(/[−–—‒‑⁻]/g, '-').replace(/⁺/g, '+').replace(/[⁰¹²³⁴⁵⁶⁷⁸⁹]/g, c => SUPS.indexOf(c)).replace(/[^\d+-]/g, '');
+  const d = s.replace(/[+-]/g, '').replace(/^0+/, '').slice(0, 2), signs = s.match(/[+-]/g), sg = signs ? signs[signs.length - 1] : '';
+  return { d, sg, txt: d + (sg === '-' ? '−' : sg), ascii: d + sg };
+}
+function chemEditor(src) {
+  if (src._ce) return src._ce;
+  const root = document.createElement('div'); root.className = 'ce'; root.setAttribute('role', 'group'); root.setAttribute('aria-label', 'Formula editor');
+  root.innerHTML = `<div class="ce-field"><input class="ce-main" type="text" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" placeholder="SO4" aria-label="Formula. Numbers after a letter become subscripts."><span class="ce-cbox"><input class="ce-chg" type="text" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" placeholder="±" maxlength="4" aria-label="Charge, like 2- or 1+"><small aria-hidden="true">charge</small></span></div>
+   <div class="ce-tools"><button type="button" data-ce="sub" title="Numbers after a letter become subscripts"><i class="ce-ico" aria-hidden="true">x₂</i><span>Subscript</span></button><button type="button" data-ce="chg" title="Jump to the charge box (or type ^)"><i class="ce-ico" aria-hidden="true">x<b>±</b></i><span>Charge</span></button><span class="ce-q" aria-label="Quick charges">${CE_QUICK.map(q => `<button type="button" data-ceq="${q}" aria-label="Charge ${chargeTxt(q)}">${Math.abs(q)}${q < 0 ? '−' : '+'}</button>`).join('')}</span><button type="button" data-ce="clear" class="ce-clear">Clear</button></div>`;
+  src.parentNode.insertBefore(root, src); src.classList.add('ce-src');
+  const main = root.querySelector('.ce-main'), chg = root.querySelector('.ce-chg');
+  const ed = { root, main, chg, src };
+  const sync = () => { const a = toAscii(main.value).replace(/_/g, ''), c = ceChg(chg.value).ascii; src.value = a + (c ? '^' + c : ''); src.dispatchEvent(new Event('input', { bubbles: true })); root.classList.toggle('has-chg', !!c); };
+  const toChg = (pre) => { if (pre != null) chg.value = ceChg(chg.value + pre).txt; chg.focus(); try { chg.setSelectionRange(chg.value.length, chg.value.length); } catch (e) {} };
+  const toMainEnd = () => { main.focus(); try { main.setSelectionRange(main.value.length, main.value.length); } catch (e) {} };
+  const submit = () => src.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', bubbles: true, cancelable: true }));
+  main.addEventListener('input', e => {
+    if (e.isComposing) return;
+    const v = main.value, atEnd = main.selectionStart === v.length;
+    const a = toAscii(v).replace(/_/g, '');
+    if (a.includes('^')) { const i = a.indexOf('^'); main.value = subBase(a.slice(0, i)); chg.value = ceChg(a.slice(i + 1)).txt; sync(); toChg(); return; }
+    if (/[+-]/.test(a)) { /* SO42- or NO3- typed in one go: split it like smart typing does */
+      const p = parseIon(a); let c = '';
+      if (p.charge != null) c = (Math.abs(p.charge) === 1 && !/1[+-]$/.test(a) ? '' : Math.abs(p.charge)) + (p.charge < 0 ? '-' : '+');
+      main.value = subBase(p.base.replace(/[+-]/g, '')); chg.value = ceChg(c || a.replace(/^[^+-]*/, '')).txt; sync(); toChg(); return;
+    }
+    if (atEnd) { const f = subBase(a); if (f !== v) main.value = f; }
+    sync();
+  });
+  main.addEventListener('keydown', e => {
+    if (e.key === 'Enter') { e.preventDefault(); return submit(); }
+    if (e.key === '^') { e.preventDefault(); return toChg(); }
+    if (e.key === 'ArrowRight' && main.selectionStart === main.value.length) { e.preventDefault(); toChg(); }
+  });
+  chg.addEventListener('input', () => { const c = ceChg(chg.value); if (chg.value !== c.txt) chg.value = c.txt; sync(); });
+  chg.addEventListener('keydown', e => {
+    if (e.key === 'Enter') { e.preventDefault(); return submit(); }
+    if (e.key === '^') { e.preventDefault(); return; }
+    if ((e.key === 'Backspace' && !chg.value) || (e.key === 'ArrowLeft' && chg.selectionStart === 0)) { e.preventDefault(); toMainEnd(); }
+  });
+  root.addEventListener('click', e => {
+    const b = e.target.closest('button'); if (!b || b.disabled) return;
+    if (b.dataset.ceq) { const q = +b.dataset.ceq; chg.value = (Math.abs(q) === 1 ? '1' : Math.abs(q)) + (q < 0 ? '−' : '+'); sync(); root.querySelectorAll('[data-ceq]').forEach(x => x.classList.toggle('on', x === b)); if (!coarse()) chg.focus(); return; }
+    if (b.dataset.ce === 'sub') { root.classList.add('tip-sub'); setTimeout(() => root.classList.remove('tip-sub'), 2600); return toMainEnd(); }
+    if (b.dataset.ce === 'chg') return toChg();
+    if (b.dataset.ce === 'clear') { ed.reset(); toMainEnd(); }
+  });
+  chg.addEventListener('input', () => root.querySelectorAll('[data-ceq]').forEach(x => x.classList.toggle('on', ceChg(chg.value).ascii === (x.textContent.replace('−', '-')))));
+  ed.reset = () => { main.value = ''; chg.value = ''; root.querySelectorAll('[data-ceq]').forEach(x => x.classList.remove('on')); sync(); };
+  ed.setDisabled = d => { root.classList.toggle('off', d); root.querySelectorAll('input,button').forEach(x => { x.disabled = d; }); };
+  /* the old code focuses or disables the hidden input: pass that on to the editor */
+  src.focus = opts => { try { main.focus(opts); } catch (e) { main.focus(); } };
+  new MutationObserver(() => ed.setDisabled(src.disabled)).observe(src, { attributes: true, attributeFilter: ['disabled'] });
+  ed.setDisabled(src.disabled);
+  src._ce = ed; return ed;
+}
+const CE_NOTE = 'Type the formula (numbers become subscripts), then put the charge in the small <b>charge</b> box. Or type it all at once: <code>SO4^2-</code>, <code>SO_4^2-</code> or <code>SO42-</code>. Symbols are case-sensitive (Cl, not CL).';
+const _ceNew = newQuestion;
+newQuestion = function (focus) {
+  const box = $('answer'), ed = chemEditor(box);
+  _ceNew(focus);
+  const q = state.q, formula = !!q && q.kind === 'formula';
+  ed.reset(); ed.root.hidden = !formula; box.classList.toggle('ce-src', formula);
+  if (formula) { $('typingNote').innerHTML = CE_NOTE; if (focus && !coarse()) { try { ed.main.focus({ preventScroll: true }); } catch (e) {} } }
+};
+const _ceOT = renderOT;
+renderOT = function (focusInput) {
+  _ceOT(focusInput);
+  const inp = $('otIn'); if (!inp) return;
+  const ed = chemEditor(inp);
+  if (focusInput && (!coarse() || focusInput === 'keep')) { try { ed.main.focus({ preventScroll: true }); } catch (e) {} }
+};
 if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init); else init();
 </script>
 <script>/* iOS: a quick second tap on a button that just turned disabled must not zoom the page (2026-11-14) */document.addEventListener("touchend",e=>{const b=e.target&&e.target.closest&&e.target.closest("button");if(b&&b.disabled&&e.cancelable)e.preventDefault()},{passive:false});</script>
