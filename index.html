@@ -1479,7 +1479,7 @@ function otNewQ() {
   const keys = otTiles();
   return { mode: 'table', kind: 'table', ion: null, eq: 'Oxyanion Table', eqName: true, steps: null, answer: '', solution: '',
     prompt: sub === 'type' ? 'Tap a cell, then type that element’s -ate ion with its charge.' : 'Tap a tile, then tap the cell it fits. A tile fits every cell with that O count and charge.',
-    hint: OT_RECAP, ot: { sub, cells, sel: OT_IONS[0].name, tiles: keys.map(k => ({ key: k, used: false })), tsel: null, fb: '', fbKind: '', mistakes: 0, firstTry: 0 } };
+    hint: OT_RECAP, ot: { sub, cells, sel: OT_IONS[0].name, tiles: keys.map(k => ({ key: k, used: false })), tsel: null, showKey: false, fb: '', fbKind: '', mistakes: 0, firstTry: 0 } };
 }
 const otTileHTML = key => { const [o, q] = key.split('|').map(Number); return `<span class="ot-x" aria-hidden="true"></span>O<sub>${o}</sub>${chargeHTML(q)}`; };
 const otTileLabel = key => { const [o, q] = key.split('|').map(Number); return `Tile: blank plus O ${o}, charge ${chargeTxt(q)}`; };
@@ -1499,7 +1499,7 @@ function renderOT(focusInput) {
   if (left && T.sub === 'tiles') html += `<div class="ot-tray" role="group" aria-label="Tiles">${[...new Set(T.tiles.map(t => t.key))].map(k => { const n = T.tiles.filter(t => !t.used && t.key === k).length; return n ? `<button type="button" class="ot-tile${T.tsel === k ? ' on' : ''}" data-ott="${k}" draggable="true" aria-pressed="${T.tsel === k}" aria-label="${otTileLabel(k)}, ${n} left">${otTileHTML(k)}<span class="ot-n" aria-hidden="true">×${n}</span></button>` : ''; }).join('')}</div>`;
   sullyMood(SULLY_MOOD[T.fbKind] || 'idle');
   html += T.fb ? sullyRow(`<div class="ot-fb ${T.fbKind}" role="status" aria-live="polite">${T.fb}</div>`) : `<div class="ot-fb ${T.fbKind}" role="status" aria-live="polite">${T.fb}</div>`;
-  html += otKeyHTML();
+  if (T.showKey) html += otKeyHTML(); /* the T43 key is help: it appears after Hint, Show answer or a second miss */
   html += `<div class="ot-grid">${OT_COLS.map(g => `<div class="ot-grp" aria-hidden="true">${g}</div>`).join('')}${OT_LAYOUT.map((n, i) => n ? otCellHTML(byName(n), T) : `<div class="ot-blank" aria-hidden="true">${OT_GHOST[i]}</div>`).join('')}</div>`;
   box.innerHTML = html;
   q.hint = left && T.sub === 'type' && COLUMN_TIP[otPat(selIon).el] ? 'Professor Tip: ' + COLUMN_TIP[otPat(selIon).el] : OT_RECAP;
@@ -1532,14 +1532,14 @@ function otCheckTyped() {
   const r = otGrade(raw, ion, c.miss + 1);
   if (firstTry) { P.tried++; bump('table', r.ok); otLog('Oxyanion Table · ' + ion.name, r.ok, r.slip); }
   if (r.ok) { T.fbKind = 'good'; T.fb = `✓ ${otPat(ion).el}: ${chemHTML(ion)} is <b>${ion.name}</b>.`; otCellRight(ion); }
-  else { c.miss++; if (firstTry) P.streak = 0; T.fbKind = 'bad'; T.fb = `<b>Not quite.</b>${partsHTML(r)} ${r.note || 'Check it and try again.'}${c.miss >= 2 ? ' <br>Stuck? Tap <b>Show answer</b> for this cell.' : ''}`; save(); renderStats(); }
+  else { c.miss++; if (c.miss >= 2) T.showKey = true; if (firstTry) P.streak = 0; T.fbKind = 'bad'; T.fb = `<b>Not quite.</b>${partsHTML(r)} ${r.note || 'Check it and try again.'}${c.miss >= 2 ? ' <br>Stuck? Tap <b>Show answer</b> for this cell.' : ''}`; save(); renderStats(); }
   renderOT('keep');
 }
 function otPlace(key, name) {
   const q = state.q, T = q.ot, t = T.tiles.find(x => !x.used && x.key === key), ion = byName(name), c = T.cells[name];
   if (!t || t.used || c.done || state.done) return;
   if (otFits(t.key, ion)) { t.used = true; if (!T.tiles.some(x => !x.used && x.key === key)) T.tsel = null; T.fbKind = 'good'; T.fb = `✓ ${otPat(ion).el} + ${otTileHTML(t.key)} = ${chemHTML(ion)}, <b>${ion.name}</b>.`; otCellRight(ion); }
-  else { c.miss++; T.mistakes++; T.fbKind = 'bad'; T.fb = `<b>That tile does not fit ${otPat(ion).el}.</b> ${otWhy(t.key, ion, c.miss)}`; save(); }
+  else { c.miss++; if (c.miss >= 2) T.showKey = true; T.mistakes++; T.fbKind = 'bad'; T.fb = `<b>That tile does not fit ${otPat(ion).el}.</b> ${otWhy(t.key, ion, c.miss)}`; save(); }
   renderOT();
   if (!state.done) { const b = document.querySelector('#otLab .ot-tile'); if (b && !coarse()) b.focus(); }
 }
@@ -1557,7 +1557,7 @@ newQuestion = function (focus) {
 const _otSol = showSolution;
 showSolution = function () {
   const q = state.q; if (!q || q.mode !== 'table') return _otSol();
-  if (state.done) return; const T = q.ot;
+  if (state.done) return; const T = q.ot; T.showKey = true;
   if (T.sub === 'type') { const ion = byName(T.sel); if (T.cells[ion.name].tries === 0) { T.cells[ion.name].tries++; P.tried++; bump('table', false); otLog('Oxyanion Table · ' + ion.name, false, 'gave-up'); P.streak = 0; } T.fbKind = 'info'; T.fb = `<b>Answer:</b> ${otPat(ion).el} → ${chemHTML(ion)}, ${ion.name}. ${tip('Professor Tip: ' + (COLUMN_TIP[otPat(ion).el] || ''))}`; otCellRight(ion, true); }
   else { const ion = OT_IONS.find(i => !T.cells[i.name].done), k = T.tiles.findIndex(t => !t.used && otFits(t.key, ion)); T.tiles[k].used = true; T.tsel = null; T.mistakes++; T.fbKind = 'info'; T.fb = `<b>Placed for you:</b> ${otPat(ion).el} + ${otTileHTML(T.tiles[k].key)} = ${chemHTML(ion)}, ${ion.name}.`; otCellRight(ion, true); }
   renderOT(true);
@@ -1566,7 +1566,7 @@ const _otChooser = renderChooser;
 renderChooser = function () { _otChooser(); if (state.mode === 'table' && !state.quiz) $('setWrap').hidden = true; };
 document.addEventListener('click', e => {
   const q = state.q; if (!q || q.mode !== 'table') return; const T = q.ot;
-  if (e.target.closest('#hintBtn')) { const c = T.cells[T.sel]; if (T.sub === 'type' && c && !c.done) c.helped = true; return; }
+  if (e.target.closest('#hintBtn')) { const c = T.cells[T.sel]; if (T.sub === 'type' && c && !c.done) c.helped = true; if (!T.showKey) { T.showKey = true; renderOT(); } return; }
   const s = e.target.closest('[data-otsub]'); if (s) { if (s.dataset.otsub !== T.sub) { P.otSub = s.dataset.otsub; save(); newQuestion(true); } return; }
   if (e.target.closest('#otCheck')) return otCheckTyped();
   const t = e.target.closest('[data-ott]'); if (t) { const k = t.dataset.ott; T.tsel = T.tsel === k ? null : k; T.fb = ''; T.fbKind = ''; renderOT(); const b = document.querySelector(`#otLab [data-ott="${k}"]`); if (b && !coarse()) b.focus(); return; }
