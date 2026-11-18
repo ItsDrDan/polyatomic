@@ -6,18 +6,22 @@ const html = fs.readFileSync(path.join(__dirname, '..', 'index.html'), 'utf8');
 const block = html.split('<script>').map(x => x.split('</script>')[0]).find(x => x.includes('/*OT-LOGIC-START*/'));
 if (!block) throw new Error('OT logic block not found');
 const ctx = {}; vm.createContext(ctx);
-vm.runInContext(block + '\n;this.G={OT_LAYOUT,OT_IONS,otPat,otKey,otFits,otTiles,otWhy,otGrade,MODES,COLUMN_TIP};', ctx);
+vm.runInContext(block + '\n;this.G={OT_GHOST,T43,OT_LAYOUT,OT_IONS,otPat,otKey,otFits,otTiles,otWhy,otGrade,MODES,COLUMN_TIP};', ctx);
 const G = ctx.G; let n = 0, fail = 0;
 const ok = (c, m) => { n++; if (!c) { fail++; if (fail < 25) console.log('FAIL', m); } };
-// Green Sheet staircase, row by row: [element, O count, charge, name]
+// lined up like the periodic table (groups 13-17, periods 2-5): [element, O count, charge, name]
 const REF = [
-  [['B', 3, -3, 'borate'], ['C', 3, -2, 'carbonate'], ['N', 3, -1, 'nitrate'], null],
-  [['Si', 3, -2, 'silicate'], ['P', 4, -3, 'phosphate'], ['S', 4, -2, 'sulfate'], ['Cl', 3, -1, 'chlorate']],
-  [null, ['As', 4, -3, 'arsenate'], ['Se', 4, -2, 'selenate'], ['Br', 3, -1, 'bromate']],
-  [null, null, ['Te', 4, -2, 'tellurate'], ['I', 3, -1, 'iodate']]
+  [['B', 3, -3, 'borate'], ['C', 3, -2, 'carbonate'], ['N', 3, -1, 'nitrate'], null, null],
+  [null, ['Si', 3, -2, 'silicate'], ['P', 4, -3, 'phosphate'], ['S', 4, -2, 'sulfate'], ['Cl', 3, -1, 'chlorate']],
+  [null, null, ['As', 4, -3, 'arsenate'], ['Se', 4, -2, 'selenate'], ['Br', 3, -1, 'bromate']],
+  [null, null, null, ['Te', 4, -2, 'tellurate'], ['I', 3, -1, 'iodate']]
 ].flat();
+// T43 method: the T has 3 O, the 4 has 4 O, the 3 has 3 O
+const T43REF = { B: 'T', C: 'T', N: 'T', Si: 'T', P: '4', S: '4', As: '4', Se: '4', Te: '4', Cl: '3', Br: '3', I: '3' };
 const sub = d => (d > 1 ? d : ''), chg = q => (Math.abs(q) === 1 ? '' : Math.abs(q)) + (q < 0 ? '-' : '+');
-ok(G.OT_LAYOUT.length === 16, 'layout 16 slots');
+ok(G.OT_LAYOUT.length === 20, 'layout 20 slots');
+ok(G.OT_GHOST.length === 20, 'ghost row 20 slots');
+G.OT_LAYOUT.forEach((n, i) => ok(!!n !== !!G.OT_GHOST[i] || (!n && !G.OT_GHOST[i]), `slot ${i} is an ion or a ghost, not both`));
 REF.forEach((r, i) => {
   const name = G.OT_LAYOUT[i];
   if (!r) return ok(name === null, `slot ${i} blank`);
@@ -26,6 +30,8 @@ REF.forEach((r, i) => {
   if (!ion) return;
   const p = G.otPat(ion); ok(p.el === r[0] && p.o === r[1] && p.q === r[2], `${r[3]} pattern ${JSON.stringify(p)}`);
   ok(!!G.COLUMN_TIP[r[0]], `${r[0]} has a column tip`);
+  ok(G.T43[r[0]] === T43REF[r[0]], `${r[0]} T43 group`);
+  ok(String(r[1]) === ({ T: '3', 4: '4', 3: '3' })[G.T43[r[0]]], `${r[0]} T43 shape gives ${r[1]} O`);
   // typed answers: every accepted style passes, common mistakes fail with a note
   const base = r[0] + 'O' + sub(r[1]), m = Math.abs(r[2]);
   for (const t of [base + '^' + chg(r[2]), base + chg(r[2]), base + (r[2] < 0 ? '-' : '+') + (m > 1 ? m : ''), r[0] + 'O' + (r[1] > 1 ? String.fromCharCode(0x2080 + r[1]) : '') + (m > 1 ? String.fromCharCode([0x2070, 0xb9, 0xb2, 0xb3][m]) : '') + '⁻'])
