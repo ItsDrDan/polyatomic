@@ -192,6 +192,22 @@ dialog{border:0;border-radius:18px;box-shadow:0 24px 80px #14173855;padding:0;wi
  html{scroll-padding-top:8px}
 }
 @media(max-width:400px){.tb-xp{display:none}}
+.tb-short,.seg-short{display:none}
+/* Phones: keep the top bar on one row (2026-11-17). Title shortens to logo + "Posse" (logo only under 360px);
+   the hidden words stay readable to screen readers. Course labels shorten to 3A / 1A (aria-labels keep CHEM). */
+@media(max-width:480px){
+ .tb{flex-wrap:nowrap;gap:6px;padding:4px 8px;min-height:0}
+ .tb-brand{gap:6px;min-width:0}
+ .tb-name{position:absolute;width:1px;height:1px;margin:-1px;overflow:hidden;clip:rect(0 0 0 0);clip-path:inset(50%);white-space:nowrap}
+ .tb-short{display:inline}
+ .seg{flex:none;padding:3px;gap:3px;border-radius:13px}
+ .seg button{padding:6px 10px;min-height:44px;min-width:46px;font-size:1rem}
+ .seg-full{display:none}.seg-short{display:inline}
+ .tb-xp{display:none}
+ .tb-streak{flex:none;min-height:44px;min-width:44px;justify-content:center;padding:6px 9px}
+ #sheetBtn{flex:none;min-width:44px;justify-content:center;padding:7px 10px}
+}
+@media(max-width:359px){.tb-short{display:none}}
 html.dd-embedded{scroll-padding-top:8px}
 @media(prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important;scroll-behavior:auto!important}}
 
@@ -377,8 +393,8 @@ details.section>summary small{color:#7a6a8a}
 </head>
 <body><canvas id="celebrationCanvas" aria-hidden="true" hidden></canvas><div class="toasts" id="toasts" aria-live="polite"></div>
 <header class="topbar"><div class="tb">
- <div class="tb-brand"><span class="tb-logo" data-icon="atom" aria-hidden="true"></span>Polyatomic Posse</div>
- <div class="seg" id="course" role="group" aria-label="Course"><button type="button" data-course="3A">CHEM 3A</button><button type="button" data-course="1A">CHEM 1A</button></div>
+ <div class="tb-brand" aria-label="Polyatomic Posse"><span class="tb-logo" data-icon="atom" aria-hidden="true"></span><span class="tb-name">Polyatomic Posse</span><span class="tb-short" aria-hidden="true">Posse</span></div>
+ <div class="seg" id="course" role="group" aria-label="Course"><button type="button" data-course="3A" aria-label="CHEM 3A"><span class="seg-full">CHEM 3A</span><span class="seg-short">3A</span></button><button type="button" data-course="1A" aria-label="CHEM 1A"><span class="seg-full">CHEM 1A</span><span class="seg-short">1A</span></button></div>
  <div class="tb-xp"><span class="ico" data-icon="trophy" aria-hidden="true"></span><div><b id="rankName">Ion Intern</b><div class="xpbar" aria-hidden="true"><span id="xpFill"></span></div><small id="xpShort">0 XP</small></div></div>
  <div class="tb-streak" title="Current streak"><span data-icon="flame" aria-hidden="true"></span><b id="streak">0</b></div>
  <button type="button" class="tb-btn" id="sheetBtn" aria-label="Open the Green Sheet ion list"><span data-icon="book" aria-hidden="true"></span><span class="lbl">Green Sheet</span></button>
